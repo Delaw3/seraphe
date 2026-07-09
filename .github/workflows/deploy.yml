@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Deploy to DigitalOcean
@@ -33,5 +34,7 @@ jobs:
             -p "$DROPLET_PORT" \
             -o IdentitiesOnly=yes \
             -o BatchMode=yes \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=10 \
             "$DROPLET_USER@$DROPLET_HOST" \
             '/var/www/seraphe/deploy.sh'
