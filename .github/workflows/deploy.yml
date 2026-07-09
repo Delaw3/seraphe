@@ -15,9 +15,20 @@ jobs:
           DROPLET_HOST: ${{ secrets.DROPLET_HOST }}
           DROPLET_USER: ${{ secrets.DROPLET_USER }}
           DROPLET_SSH_KEY: ${{ secrets.DROPLET_SSH_KEY }}
+          DROPLET_PORT: ${{ secrets.DROPLET_PORT || '22' }}
         run: |
+          test -n "$DROPLET_HOST"
+          test -n "$DROPLET_USER"
+          test -n "$DROPLET_SSH_KEY"
+
           mkdir -p ~/.ssh
-          printf '%s\n' "$DROPLET_SSH_KEY" > ~/.ssh/deploy_key
+          printf '%s\n' "$DROPLET_SSH_KEY" | tr -d '\r' > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "$DROPLET_HOST" >> ~/.ssh/known_hosts
-          ssh -i ~/.ssh/deploy_key "$DROPLET_USER@$DROPLET_HOST" '/var/www/seraphe/deploy.sh'
+          ssh-keyscan -p "$DROPLET_PORT" -H "$DROPLET_HOST" >> ~/.ssh/known_hosts
+          ssh \
+            -i ~/.ssh/deploy_key \
+            -p "$DROPLET_PORT" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            "$DROPLET_USER@$DROPLET_HOST" \
+            '/var/www/seraphe/deploy.sh'
