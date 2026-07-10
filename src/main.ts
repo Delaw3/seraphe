@@ -14,7 +14,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Seraphe API')
-    .setDescription('API documentation for the Seraphe NestJS app')
+    .setDescription('API documentation for the Seraphe app')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
