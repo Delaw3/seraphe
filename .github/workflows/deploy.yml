@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
 
     steps:
       - name: Deploy to DigitalOcean
@@ -25,9 +25,6 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "$DROPLET_SSH_KEY" | perl -pe 's/\\n/\n/g' | tr -d '\r' > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keygen -y -f ~/.ssh/deploy_key > ~/.ssh/deploy_key.pub
-          echo "Deploy key fingerprint:"
-          ssh-keygen -lf ~/.ssh/deploy_key.pub
           ssh-keyscan -p "$DROPLET_PORT" -H "$DROPLET_HOST" >> ~/.ssh/known_hosts
           ssh \
             -i ~/.ssh/deploy_key \
@@ -37,4 +34,4 @@ jobs:
             -o ServerAliveInterval=30 \
             -o ServerAliveCountMax=10 \
             "$DROPLET_USER@$DROPLET_HOST" \
-            '/var/www/seraphe/deploy.sh'
+            'bash -lc "timeout 30m /var/www/seraphe/deploy.sh"'
