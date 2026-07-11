@@ -12,6 +12,14 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: [
+      'https://serabeauty.org',
+      'https://www.seraphebeauty.org',
+      'http://localhost:3000'
+    ]
+  })
+
   const config = new DocumentBuilder()
     .setTitle('Seraphe API')
     .setDescription('API documentation for the Seraphe app')

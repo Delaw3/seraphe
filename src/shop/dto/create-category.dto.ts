@@ -1,6 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
-  IsBoolean,
   IsInt,
   IsOptional,
   IsString,
@@ -30,11 +29,6 @@ export class CreateCategoryDto {
   @IsOptional()
   @IsUrl()
   image?: string;
-
-  @ApiPropertyOptional({ default: true })
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
 
   @ApiPropertyOptional({ default: 0 })
   @IsOptional()

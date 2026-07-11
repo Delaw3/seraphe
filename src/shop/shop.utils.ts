@@ -1,3 +1,37 @@
+import { BadRequestException } from '@nestjs/common';
+import { Types } from 'mongoose';
+import { ApiResponse, PaginationMeta } from './interfaces/api-response.interface';
+
+export function createApiResponse<T>(
+  message: string,
+  data: T,
+  meta?: PaginationMeta,
+): ApiResponse<T> {
+  return {
+    success: true,
+    message,
+    data,
+    ...(meta ? { meta } : {}),
+  };
+}
+
+export function createPaginationMeta(
+  page: number,
+  limit: number,
+  total: number,
+): PaginationMeta {
+  return {
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+  };
+}
+
+export function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export function slugify(value: string): string {
   return value
     .toLowerCase()
@@ -16,4 +50,12 @@ export function toBoolean(value?: string): boolean | undefined {
   }
 
   return undefined;
+}
+
+export function toObjectId(value: string, message: string): Types.ObjectId {
+  if (!Types.ObjectId.isValid(value)) {
+    throw new BadRequestException(message);
+  }
+
+  return new Types.ObjectId(value);
 }

@@ -8,21 +8,38 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, QueryFilter, Types } from 'mongoose';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { CreateReviewDto } from './dto/create-review.dto';
 import {
   AdminQueryProductsDto,
   QueryProductsDto,
 } from './dto/query-products.dto';
+import {
+  AdminQueryReviewsDto,
+  QueryReviewsDto,
+} from './dto/query-reviews.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiResponse, PaginationMeta } from './interfaces/api-response.interface';
+import { ApiResponse } from './interfaces/api-response.interface';
 import { Category, CategoryDocument } from './schemas/category.schema';
 import { Product, ProductDocument } from './schemas/product.schema';
-import { slugify, toBoolean } from './shop.utils';
+import { Review, ReviewDocument } from './schemas/review.schema';
+import {
+  createApiResponse,
+  createPaginationMeta,
+  escapeRegex,
+  slugify,
+  toBoolean,
+  toObjectId,
+} from './shop.utils';
 
 type PlainCategory = Category & { _id: Types.ObjectId };
 type PlainProduct = Product & {
   _id: Types.ObjectId;
   category?: Types.ObjectId | PlainCategory;
+};
+type PlainReview = Review & {
+  _id: Types.ObjectId;
+  product?: Types.ObjectId | PlainProduct;
 };
 
 @Injectable()
@@ -32,6 +49,8 @@ export class ShopService {
     private readonly categoryModel: Model<CategoryDocument>,
     @InjectModel(Product.name)
     private readonly productModel: Model<ProductDocument>,
+    @InjectModel(Review.name)
+    private readonly reviewModel: Model<ReviewDocument>,
   ) {}
 
   async createCategory(
@@ -51,7 +70,7 @@ export class ShopService {
       slug,
     });
 
-    return this.response('Category created successfully.', category.toObject());
+    return createApiResponse('Category created successfully.', category.toObject());
   }
 
   async findAdminCategories(): Promise<ApiResponse<PlainCategory[]>> {
@@ -61,7 +80,7 @@ export class ShopService {
       .lean<PlainCategory[]>()
       .exec();
 
-    return this.response('Categories retrieved successfully.', categories);
+    return createApiResponse('Categories retrieved successfully.', categories);
   }
 
   async findPublicCategories(): Promise<ApiResponse<PlainCategory[]>> {
@@ -71,12 +90,12 @@ export class ShopService {
       .lean<PlainCategory[]>()
       .exec();
 
-    return this.response('Categories retrieved successfully.', categories);
+    return createApiResponse('Categories retrieved successfully.', categories);
   }
 
   async findAdminCategory(id: string): Promise<ApiResponse<PlainCategory>> {
     const category = await this.findCategoryById(id);
-    return this.response('Category retrieved successfully.', category);
+    return createApiResponse('Category retrieved successfully.', category);
   }
 
   async updateCategory(
@@ -109,7 +128,7 @@ export class ShopService {
       throw new NotFoundException('Category not found.');
     }
 
-    return this.response('Category updated successfully.', category);
+    return createApiResponse('Category updated successfully.', category);
   }
 
   async deleteCategory(id: string): Promise<ApiResponse<PlainCategory>> {
@@ -122,7 +141,7 @@ export class ShopService {
       throw new NotFoundException('Category not found.');
     }
 
-    return this.response('Category deleted successfully.', category);
+    return createApiResponse('Category deleted successfully.', category);
   }
 
   async createProduct(dto: CreateProductDto): Promise<ApiResponse<PlainProduct>> {
@@ -141,10 +160,10 @@ export class ShopService {
       images: dto.images ?? [],
       tags: dto.tags ?? [],
       isFeatured: dto.isFeatured ?? false,
-      isActive: dto.isActive ?? true,
+      isActive: true,
     });
 
-    return this.response('Product created successfully.', product.toObject());
+    return createApiResponse('Product created successfully.', product.toObject());
   }
 
   async findAdminProducts(
@@ -160,7 +179,7 @@ export class ShopService {
   }
 
   async findAdminProduct(id: string): Promise<ApiResponse<PlainProduct>> {
-    const productId = this.toObjectId(id, 'Product id is invalid.');
+    const productId = toObjectId(id, 'Product id is invalid.');
     const product = await this.productModel
       .findById(productId)
       .populate('category')
@@ -171,14 +190,14 @@ export class ShopService {
       throw new NotFoundException('Product not found.');
     }
 
-    return this.response('Product retrieved successfully.', product);
+    return createApiResponse('Product retrieved successfully.', product);
   }
 
   async updateProduct(
     id: string,
     dto: UpdateProductDto,
   ): Promise<ApiResponse<PlainProduct>> {
-    const productId = this.toObjectId(id, 'Product id is invalid.');
+    const productId = toObjectId(id, 'Product id is invalid.');
     const existing = await this.productModel.findById(productId).lean().exec();
 
     if (!existing) {
@@ -214,11 +233,11 @@ export class ShopService {
       throw new NotFoundException('Product not found.');
     }
 
-    return this.response('Product updated successfully.', product);
+    return createApiResponse('Product updated successfully.', product);
   }
 
   async deleteProduct(id: string): Promise<ApiResponse<PlainProduct>> {
-    const productId = this.toObjectId(id, 'Product id is invalid.');
+    const productId = toObjectId(id, 'Product id is invalid.');
     const product = await this.productModel
       .findByIdAndDelete(productId)
       .lean<PlainProduct>()
@@ -228,7 +247,7 @@ export class ShopService {
       throw new NotFoundException('Product not found.');
     }
 
-    return this.response('Product deleted successfully.', product);
+    return createApiResponse('Product deleted successfully.', product);
   }
 
   async getShopHome(): Promise<
@@ -249,7 +268,7 @@ export class ShopService {
         .exec(),
     ]);
 
-    return this.response('Shop retrieved successfully.', {
+    return createApiResponse('Shop retrieved successfully.', {
       categories,
       featuredProducts,
     });
@@ -293,10 +312,74 @@ export class ShopService {
       .lean<PlainProduct[]>()
       .exec();
 
-    return this.response('Product retrieved successfully.', {
+    return createApiResponse('Product retrieved successfully.', {
       product,
       relatedProducts,
     });
+  }
+
+  async createProductReview(
+    slug: string,
+    dto: CreateReviewDto,
+  ): Promise<ApiResponse<PlainReview>> {
+    const product = await this.productModel
+      .findOne({ slug, isActive: true })
+      .select('_id')
+      .lean<{ _id: Types.ObjectId }>()
+      .exec();
+
+    if (!product) {
+      throw new NotFoundException('Product not found.');
+    }
+
+    const review = await this.reviewModel.create({
+      product: product._id,
+      rating: dto.rating,
+      name: dto.name.trim(),
+      email: dto.email.toLowerCase().trim(),
+      reviewText: dto.reviewText.trim(),
+    });
+
+    return createApiResponse('Review submitted successfully.', review.toObject());
+  }
+
+  async findProductReviewsBySlug(
+    slug: string,
+    query: QueryReviewsDto,
+  ): Promise<ApiResponse<PlainReview[]>> {
+    const product = await this.productModel
+      .findOne({ slug, isActive: true })
+      .select('_id')
+      .lean<{ _id: Types.ObjectId }>()
+      .exec();
+
+    if (!product) {
+      throw new NotFoundException('Product not found.');
+    }
+
+    return this.paginateReviews(
+      { product: product._id },
+      query,
+      'Reviews retrieved successfully.',
+      false,
+    );
+  }
+
+  async findAdminReviews(
+    query: AdminQueryReviewsDto,
+  ): Promise<ApiResponse<PlainReview[]>> {
+    const filter: QueryFilter<ReviewDocument> = {};
+
+    if (query.product) {
+      filter.product = toObjectId(query.product, 'Product id is invalid.');
+    }
+
+    return this.paginateReviews(
+      filter,
+      query,
+      'Reviews retrieved successfully.',
+      true,
+    );
   }
 
   private async paginateProducts(
@@ -324,7 +407,43 @@ export class ShopService {
       this.productModel.countDocuments(filter).exec(),
     ]);
 
-    return this.response(message, products, this.pagination(page, limit, total));
+    return createApiResponse(
+      message,
+      products,
+      createPaginationMeta(page, limit, total),
+    );
+  }
+
+  private async paginateReviews(
+    filter: QueryFilter<ReviewDocument>,
+    query: QueryReviewsDto,
+    message: string,
+    populateProduct = false,
+  ): Promise<ApiResponse<PlainReview[]>> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 12;
+    const skip = (page - 1) * limit;
+
+    const reviewQuery = this.reviewModel
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    if (populateProduct) {
+      reviewQuery.populate('product');
+    }
+
+    const [reviews, total] = await Promise.all([
+      reviewQuery.lean<PlainReview[]>().exec(),
+      this.reviewModel.countDocuments(filter).exec(),
+    ]);
+
+    return createApiResponse(
+      message,
+      reviews,
+      createPaginationMeta(page, limit, total),
+    );
   }
 
   private buildAdminProductFilter(
@@ -333,7 +452,7 @@ export class ShopService {
     const filter: QueryFilter<ProductDocument> = {};
 
     if (query.category) {
-      filter.category = this.toObjectId(
+      filter.category = toObjectId(
         query.category,
         'Category id is invalid.',
       );
@@ -382,7 +501,7 @@ export class ShopService {
   }
 
   private async findCategoryById(id: string): Promise<PlainCategory> {
-    const categoryId = this.toObjectId(id, 'Category id is invalid.');
+    const categoryId = toObjectId(id, 'Category id is invalid.');
     const category = await this.categoryModel
       .findById(categoryId)
       .lean<PlainCategory>()
@@ -396,7 +515,7 @@ export class ShopService {
   }
 
   private async ensureCategoryExists(id: string): Promise<void> {
-    const categoryId = this.toObjectId(id, 'Category id is invalid.');
+    const categoryId = toObjectId(id, 'Category id is invalid.');
     const exists = await this.categoryModel.exists({ _id: categoryId });
 
     if (!exists) {
@@ -409,11 +528,11 @@ export class ShopService {
     excludeId?: string,
   ): Promise<void> {
     const filter: QueryFilter<CategoryDocument> = {
-      name: { $regex: `^${this.escapeRegex(name)}$`, $options: 'i' },
+      name: { $regex: `^${escapeRegex(name)}$`, $options: 'i' },
     };
 
     if (excludeId) {
-      filter._id = { $ne: this.toObjectId(excludeId, 'Category id is invalid.') };
+      filter._id = { $ne: toObjectId(excludeId, 'Category id is invalid.') };
     }
 
     const exists = await this.categoryModel.exists(filter);
@@ -457,7 +576,7 @@ export class ShopService {
 
     const exists = await model.exists({
       slug,
-      _id: { $ne: this.toObjectId(excludeId, 'Document id is invalid.') },
+      _id: { $ne: toObjectId(excludeId, 'Document id is invalid.') },
     } as QueryFilter<T>);
 
     if (exists) {
@@ -477,37 +596,4 @@ export class ShopService {
     return category instanceof Types.ObjectId ? category : category._id;
   }
 
-  private response<T>(
-    message: string,
-    data: T,
-    meta?: PaginationMeta,
-  ): ApiResponse<T> {
-    return {
-      success: true,
-      message,
-      data,
-      ...(meta ? { meta } : {}),
-    };
-  }
-
-  private pagination(page: number, limit: number, total: number): PaginationMeta {
-    return {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    };
-  }
-
-  private escapeRegex(value: string): string {
-    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
-  private toObjectId(value: string, message: string): Types.ObjectId {
-    if (!Types.ObjectId.isValid(value)) {
-      throw new BadRequestException(message);
-    }
-
-    return new Types.ObjectId(value);
-  }
 }

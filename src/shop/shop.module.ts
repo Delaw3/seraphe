@@ -5,6 +5,7 @@ import { AdminShopController } from './admin-shop.controller';
 import { PublicShopController } from './public-shop.controller';
 import { Category, CategorySchema } from './schemas/category.schema';
 import { Product, ProductSchema } from './schemas/product.schema';
+import { Review, ReviewSchema } from './schemas/review.schema';
 import { ShopService } from './shop.service';
 
 @Module({
@@ -13,6 +14,7 @@ import { ShopService } from './shop.service';
     MongooseModule.forFeature([
       { name: Category.name, schema: CategorySchema },
       { name: Product.name, schema: ProductSchema },
+      { name: Review.name, schema: ReviewSchema },
     ]),
   ],
   controllers: [AdminShopController, PublicShopController],

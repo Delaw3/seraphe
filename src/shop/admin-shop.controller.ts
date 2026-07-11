@@ -19,6 +19,7 @@ import { AdminJwtGuard } from '../auth/guards/admin-jwt.guard';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { AdminQueryProductsDto } from './dto/query-products.dto';
+import { AdminQueryReviewsDto } from './dto/query-reviews.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ShopService } from './shop.service';
@@ -88,5 +89,11 @@ export class AdminShopController {
   @ApiOkResponse({ description: 'Delete a shop product.' })
   deleteProduct(@Param('id') id: string) {
     return this.shopService.deleteProduct(id);
+  }
+
+  @Get('reviews')
+  @ApiOkResponse({ description: 'List product reviews across the shop.' })
+  findReviews(@Query() query: AdminQueryReviewsDto) {
+    return this.shopService.findAdminReviews(query);
   }
 }
