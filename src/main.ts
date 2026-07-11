@@ -5,6 +5,14 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    'https://seraphebeauty.org',
+    'https://www.seraphebeauty.org',
+    'https://seraphe-beauty.vercel.app',
+    'http://localhost:3000',
+  ].filter(Boolean) as string[];
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -13,13 +21,11 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: [
-      'https://serabeauty.org',
-      'https://www.seraphebeauty.org',
-      'https://seraphe-beauty.vercel.app',
-      'http://localhost:3000'
-    ]
-  })
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Seraphe API')
