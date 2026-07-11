@@ -16,6 +16,7 @@ async function bootstrap() {
     origin: [
       'https://serabeauty.org',
       'https://www.seraphebeauty.org',
+      'https://seraphe-beauty.vercel.app',
       'http://localhost:3000'
     ]
   })
