@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -50,6 +51,7 @@ export class AdminShopController {
   }
 
   @Patch('categories/:id')
+  @Put('categories/:id')
   @ApiOkResponse({ description: 'Update a shop category.' })
   updateCategory(@Param('id') id: string, @Body() dto: UpdateCategoryDto) {
     return this.shopService.updateCategory(id, dto);
@@ -80,6 +82,7 @@ export class AdminShopController {
   }
 
   @Patch('products/:id')
+  @Put('products/:id')
   @ApiOkResponse({ description: 'Update a shop product.' })
   updateProduct(@Param('id') id: string, @Body() dto: UpdateProductDto) {
     return this.shopService.updateProduct(id, dto);
