@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   IsArray,
@@ -55,6 +55,20 @@ export class CreateProductDto {
 
   @ApiPropertyOptional({
     example: ['https://example.com/products/cream-1.jpg'],
+  })
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) {
+      return value.map((item) => String(item).trim()).filter(Boolean);
+    }
+
+    if (typeof value === 'string') {
+      return value
+        .split(/[\n,]+/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    return value;
   })
   @IsOptional()
   @IsArray()
