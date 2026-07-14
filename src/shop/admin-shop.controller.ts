@@ -17,6 +17,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AdminJwtGuard } from '../auth/guards/admin-jwt.guard';
+import {
+  categoryExample,
+  paginatedResponseExample,
+  productExample,
+  reviewExample,
+  successResponseExample,
+} from '../common/swagger-response.examples';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { AdminQueryProductsDto } from './dto/query-products.dto';
@@ -33,69 +40,154 @@ export class AdminShopController {
   constructor(private readonly shopService: ShopService) {}
 
   @Post('categories')
-  @ApiCreatedResponse({ description: 'Create a shop category.' })
+  @ApiCreatedResponse({
+    description: 'Create a shop category.',
+    schema: {
+      example: successResponseExample(
+        'Category created successfully.',
+        categoryExample,
+      ),
+    },
+  })
   createCategory(@Body() dto: CreateCategoryDto) {
     return this.shopService.createCategory(dto);
   }
 
   @Get('categories')
-  @ApiOkResponse({ description: 'List all shop categories.' })
+  @ApiOkResponse({
+    description: 'List all shop categories.',
+    schema: {
+      example: successResponseExample('Categories retrieved successfully.', [
+        categoryExample,
+      ]),
+    },
+  })
   findCategories() {
     return this.shopService.findAdminCategories();
   }
 
   @Get('categories/:id')
-  @ApiOkResponse({ description: 'Get one shop category.' })
+  @ApiOkResponse({
+    description: 'Get one shop category.',
+    schema: {
+      example: successResponseExample(
+        'Category retrieved successfully.',
+        categoryExample,
+      ),
+    },
+  })
   findCategory(@Param('id') id: string) {
     return this.shopService.findAdminCategory(id);
   }
 
   @Patch('categories/:id')
   @Put('categories/:id')
-  @ApiOkResponse({ description: 'Update a shop category.' })
+  @ApiOkResponse({
+    description: 'Update a shop category.',
+    schema: {
+      example: successResponseExample(
+        'Category updated successfully.',
+        categoryExample,
+      ),
+    },
+  })
   updateCategory(@Param('id') id: string, @Body() dto: UpdateCategoryDto) {
     return this.shopService.updateCategory(id, dto);
   }
 
   @Delete('categories/:id')
-  @ApiOkResponse({ description: 'Delete a shop category.' })
+  @ApiOkResponse({
+    description: 'Delete a shop category.',
+    schema: {
+      example: successResponseExample(
+        'Category deleted successfully.',
+        categoryExample,
+      ),
+    },
+  })
   deleteCategory(@Param('id') id: string) {
     return this.shopService.deleteCategory(id);
   }
 
   @Post('products')
-  @ApiCreatedResponse({ description: 'Create a shop product.' })
+  @ApiCreatedResponse({
+    description: 'Create a shop product.',
+    schema: {
+      example: successResponseExample(
+        'Product created successfully.',
+        productExample,
+      ),
+    },
+  })
   createProduct(@Body() dto: CreateProductDto) {
     return this.shopService.createProduct(dto);
   }
 
   @Get('products')
-  @ApiOkResponse({ description: 'List shop products.' })
+  @ApiOkResponse({
+    description: 'List shop products.',
+    schema: {
+      example: paginatedResponseExample('Products retrieved successfully.', [
+        productExample,
+      ]),
+    },
+  })
   findProducts(@Query() query: AdminQueryProductsDto) {
     return this.shopService.findAdminProducts(query);
   }
 
   @Get('products/:id')
-  @ApiOkResponse({ description: 'Get one shop product.' })
+  @ApiOkResponse({
+    description: 'Get one shop product.',
+    schema: {
+      example: successResponseExample(
+        'Product retrieved successfully.',
+        productExample,
+      ),
+    },
+  })
   findProduct(@Param('id') id: string) {
     return this.shopService.findAdminProduct(id);
   }
 
   @Patch('products/:id')
   @Put('products/:id')
-  @ApiOkResponse({ description: 'Update a shop product.' })
+  @ApiOkResponse({
+    description: 'Update a shop product.',
+    schema: {
+      example: successResponseExample(
+        'Product updated successfully.',
+        productExample,
+      ),
+    },
+  })
   updateProduct(@Param('id') id: string, @Body() dto: UpdateProductDto) {
     return this.shopService.updateProduct(id, dto);
   }
 
   @Delete('products/:id')
-  @ApiOkResponse({ description: 'Delete a shop product.' })
+  @ApiOkResponse({
+    description: 'Delete a shop product.',
+    schema: {
+      example: successResponseExample(
+        'Product deleted successfully.',
+        productExample,
+      ),
+    },
+  })
   deleteProduct(@Param('id') id: string) {
     return this.shopService.deleteProduct(id);
   }
 
   @Get('reviews')
-  @ApiOkResponse({ description: 'List product reviews across the shop.' })
+  @ApiOkResponse({
+    description: 'List product reviews across the shop.',
+    schema: {
+      example: paginatedResponseExample('Reviews retrieved successfully.', [
+        reviewExample,
+      ]),
+    },
+  })
   findReviews(@Query() query: AdminQueryReviewsDto) {
     return this.shopService.findAdminReviews(query);
   }

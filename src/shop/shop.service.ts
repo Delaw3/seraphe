@@ -27,6 +27,7 @@ import {
   createApiResponse,
   createPaginationMeta,
   escapeRegex,
+  omitInternalFields,
   slugify,
   toBoolean,
   toObjectId,
@@ -90,7 +91,10 @@ export class ShopService {
       .lean<PlainCategory[]>()
       .exec();
 
-    return createApiResponse('Categories retrieved successfully.', categories);
+    return createApiResponse(
+      'Categories retrieved successfully.',
+      omitInternalFields(categories),
+    );
   }
 
   async findAdminCategory(id: string): Promise<ApiResponse<PlainCategory>> {
@@ -132,8 +136,9 @@ export class ShopService {
   }
 
   async deleteCategory(id: string): Promise<ApiResponse<PlainCategory>> {
+    const categoryId = toObjectId(id, 'Category id is invalid.');
     const category = await this.categoryModel
-      .findByIdAndDelete(id)
+      .findByIdAndUpdate(categoryId, { isActive: false }, { new: true })
       .lean<PlainCategory>()
       .exec();
 
@@ -239,7 +244,8 @@ export class ShopService {
   async deleteProduct(id: string): Promise<ApiResponse<PlainProduct>> {
     const productId = toObjectId(id, 'Product id is invalid.');
     const product = await this.productModel
-      .findByIdAndDelete(productId)
+      .findByIdAndUpdate(productId, { isActive: false }, { new: true })
+      .populate('category')
       .lean<PlainProduct>()
       .exec();
 
@@ -268,10 +274,10 @@ export class ShopService {
         .exec(),
     ]);
 
-    return createApiResponse('Shop retrieved successfully.', {
+    return createApiResponse('Shop retrieved successfully.', omitInternalFields({
       categories,
       featuredProducts,
-    });
+    }));
   }
 
   async findPublicProducts(
@@ -279,12 +285,17 @@ export class ShopService {
   ): Promise<ApiResponse<PlainProduct[]>> {
     const filter = await this.buildPublicProductFilter(query);
 
-    return this.paginateProducts(
+    const response = await this.paginateProducts(
       filter,
       query,
       'Products retrieved successfully.',
       true,
     );
+
+    return {
+      ...response,
+      data: omitInternalFields(response.data),
+    };
   }
 
   async findPublicProductBySlug(
@@ -312,10 +323,10 @@ export class ShopService {
       .lean<PlainProduct[]>()
       .exec();
 
-    return createApiResponse('Product retrieved successfully.', {
+    return createApiResponse('Product retrieved successfully.', omitInternalFields({
       product,
       relatedProducts,
-    });
+    }));
   }
 
   async createProductReview(

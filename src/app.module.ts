@@ -4,6 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { BeautyTipsModule } from './beauty-tips/beauty-tips.module';
+import { LifestyleModule } from './lifestyle/lifestyle.module';
 import { ShopModule } from './shop/shop.module';
 
 @Module({
@@ -18,6 +20,8 @@ import { ShopModule } from './shop/shop.module';
       }),
     }),
     AuthModule,
+    BeautyTipsModule,
+    LifestyleModule,
     ShopModule,
   ],
   controllers: [AppController],
