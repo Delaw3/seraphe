@@ -1,4 +1,8 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ApiHideProperty,
+  ApiProperty,
+  ApiPropertyOptional,
+} from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
@@ -20,7 +24,10 @@ export class CreateProductDto {
   @MinLength(2)
   name: string;
 
-  @ApiPropertyOptional({ example: 'hydrating-face-cream' })
+  @ApiHideProperty()
+  @Transform(({ value }) =>
+    typeof value === 'string' && !value.trim() ? undefined : value,
+  )
   @IsOptional()
   @IsString()
   @MinLength(2)

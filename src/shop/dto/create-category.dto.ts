@@ -1,4 +1,9 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ApiHideProperty,
+  ApiProperty,
+  ApiPropertyOptional,
+} from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsInt,
   IsOptional,
@@ -14,7 +19,10 @@ export class CreateCategoryDto {
   @MinLength(2)
   name: string;
 
-  @ApiPropertyOptional({ example: 'skincare' })
+  @ApiHideProperty()
+  @Transform(({ value }) =>
+    typeof value === 'string' && !value.trim() ? undefined : value,
+  )
   @IsOptional()
   @IsString()
   @MinLength(2)

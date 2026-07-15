@@ -62,7 +62,7 @@ export class ShopService {
 
     const slug = await this.resolveUniqueSlug(
       this.categoryModel,
-      dto.slug ?? name,
+      dto.slug?.trim() || name,
     );
 
     const category = await this.categoryModel.create({
@@ -115,7 +115,8 @@ export class ShopService {
       update.name = name;
     }
 
-    if (dto.slug) {
+    delete update.slug;
+    if (dto.slug?.trim()) {
       update.slug = await this.resolveProvidedSlug(
         this.categoryModel,
         dto.slug,
@@ -154,7 +155,7 @@ export class ShopService {
 
     const slug = await this.resolveUniqueSlug(
       this.productModel,
-      dto.slug ?? dto.name,
+      dto.slug?.trim() || dto.name,
     );
 
     const product = await this.productModel.create({
@@ -220,7 +221,8 @@ export class ShopService {
       update.name = dto.name.trim();
     }
 
-    if (dto.slug) {
+    delete update.slug;
+    if (dto.slug?.trim()) {
       update.slug = await this.resolveProvidedSlug(
         this.productModel,
         dto.slug,

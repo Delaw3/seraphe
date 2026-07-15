@@ -34,7 +34,7 @@ export class LifestyleService {
   async createArticle(
     dto: CreateLifestyleArticleDto,
   ): Promise<ApiResponse<PlainLifestyleArticle>> {
-    const slug = await this.resolveUniqueSlug(dto.slug ?? dto.title);
+    const slug = await this.resolveUniqueSlug(dto.slug?.trim() || dto.title);
     const article = await this.lifestyleArticleModel.create({
       ...dto,
       title: dto.title.trim(),
@@ -95,7 +95,7 @@ export class LifestyleService {
 
     return createApiResponse(
       'Lifestyle article retrieved successfully.',
-      omitInternalFields(article),
+      article,
     );
   }
 
@@ -113,7 +113,7 @@ export class LifestyleService {
 
     return createApiResponse(
       'Lifestyle article retrieved successfully.',
-      article,
+      omitInternalFields(article),
     );
   }
 
@@ -137,7 +137,8 @@ export class LifestyleService {
       update.title = dto.title.trim();
     }
 
-    if (dto.slug) {
+    delete update.slug;
+    if (dto.slug?.trim()) {
       update.slug = await this.resolveProvidedSlug(dto.slug, id);
     }
 

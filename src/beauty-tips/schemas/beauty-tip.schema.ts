@@ -44,7 +44,6 @@ export class BeautyTip {
 
 export const BeautyTipSchema = SchemaFactory.createForClass(BeautyTip);
 
-BeautyTipSchema.index({ slug: 1 }, { unique: true });
 BeautyTipSchema.index({ categorySlug: 1 });
 BeautyTipSchema.index({ isActive: 1 });
 BeautyTipSchema.index({ order: 1 });

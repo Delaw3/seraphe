@@ -5,8 +5,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { BeautyTipsModule } from './beauty-tips/beauty-tips.module';
+import { CommunityModule } from './community/community.module';
 import { LifestyleModule } from './lifestyle/lifestyle.module';
+import { SerapheModelsModule } from './seraphe-models/seraphe-models.module';
 import { ShopModule } from './shop/shop.module';
+import { TeamModule } from './team/team.module';
+import { TrendsModule } from './trends/trends.module';
 
 @Module({
   imports: [
@@ -21,8 +25,12 @@ import { ShopModule } from './shop/shop.module';
     }),
     AuthModule,
     BeautyTipsModule,
+    CommunityModule,
     LifestyleModule,
+    SerapheModelsModule,
     ShopModule,
+    TeamModule,
+    TrendsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

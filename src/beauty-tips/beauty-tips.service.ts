@@ -33,7 +33,7 @@ export class BeautyTipsService {
   ) {}
 
   async createTip(dto: CreateBeautyTipDto): Promise<ApiResponse<PlainBeautyTip>> {
-    const slug = await this.resolveUniqueSlug(dto.slug ?? dto.title);
+    const slug = await this.resolveUniqueSlug(dto.slug?.trim() || dto.title);
     const tip = await this.beautyTipModel.create({
       ...dto,
       title: dto.title.trim(),
@@ -122,7 +122,8 @@ export class BeautyTipsService {
       update.title = dto.title.trim();
     }
 
-    if (dto.slug) {
+    delete update.slug;
+    if (dto.slug?.trim()) {
       update.slug = await this.resolveProvidedSlug(dto.slug, id);
     }
 
