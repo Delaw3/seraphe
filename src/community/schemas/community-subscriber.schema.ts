@@ -12,9 +12,6 @@ export class CommunitySubscriber {
   @Prop({ trim: true })
   name?: string;
 
-  @Prop({ trim: true })
-  source?: string;
-
   @Prop({ default: true })
   isActive: boolean;
 

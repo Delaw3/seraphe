@@ -35,7 +35,6 @@ export class CommunityService {
           $set: {
             email,
             name: dto.name?.trim(),
-            source: dto.source?.trim() ?? 'website',
             isActive: true,
             unsubscribedAt: null,
           },
@@ -132,7 +131,6 @@ export class CommunityService {
       filter.$or = [
         { email: { $regex: search, $options: 'i' } },
         { name: { $regex: search, $options: 'i' } },
-        { source: { $regex: search, $options: 'i' } },
       ];
     }
 

@@ -12,8 +12,4 @@ export class CreateCommunitySubscriberDto {
   @MinLength(2)
   name?: string;
 
-  @ApiPropertyOptional({ example: 'website-footer' })
-  @IsOptional()
-  @IsString()
-  source?: string;
 }

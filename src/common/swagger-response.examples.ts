@@ -155,7 +155,6 @@ export const communitySubscriberExample = {
   _id: '6690f3f5e7f9c1a001234577',
   email: 'jane@example.com',
   name: 'Jane Doe',
-  source: 'website-footer',
   subscribedAt: '2026-07-14T10:00:00.000Z',
   createdAt: '2026-07-14T10:00:00.000Z',
   updatedAt: '2026-07-14T10:00:00.000Z',
