@@ -13,10 +13,7 @@ import {
   AdminQueryProductsDto,
   QueryProductsDto,
 } from './dto/query-products.dto';
-import {
-  AdminQueryReviewsDto,
-  QueryReviewsDto,
-} from './dto/query-reviews.dto';
+import { AdminQueryReviewsDto, QueryReviewsDto } from './dto/query-reviews.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiResponse } from './interfaces/api-response.interface';
@@ -71,7 +68,10 @@ export class ShopService {
       slug,
     });
 
-    return createApiResponse('Category created successfully.', category.toObject());
+    return createApiResponse(
+      'Category created successfully.',
+      category.toObject(),
+    );
   }
 
   async findAdminCategories(): Promise<ApiResponse<PlainCategory[]>> {
@@ -150,7 +150,9 @@ export class ShopService {
     return createApiResponse('Category deleted successfully.', category);
   }
 
-  async createProduct(dto: CreateProductDto): Promise<ApiResponse<PlainProduct>> {
+  async createProduct(
+    dto: CreateProductDto,
+  ): Promise<ApiResponse<PlainProduct>> {
     await this.ensureCategoryExists(dto.category);
 
     const slug = await this.resolveUniqueSlug(
@@ -165,11 +167,16 @@ export class ShopService {
       category: new Types.ObjectId(dto.category),
       images: dto.images ?? [],
       tags: dto.tags ?? [],
+      averageRating: 0,
+      reviewCount: 0,
       isFeatured: dto.isFeatured ?? false,
       isActive: true,
     });
 
-    return createApiResponse('Product created successfully.', product.toObject());
+    return createApiResponse(
+      'Product created successfully.',
+      product.toObject(),
+    );
   }
 
   async findAdminProducts(
@@ -259,7 +266,10 @@ export class ShopService {
   }
 
   async getShopHome(): Promise<
-    ApiResponse<{ categories: PlainCategory[]; featuredProducts: PlainProduct[] }>
+    ApiResponse<{
+      categories: PlainCategory[];
+      featuredProducts: PlainProduct[];
+    }>
   > {
     const [categories, featuredProducts] = await Promise.all([
       this.categoryModel
@@ -276,10 +286,13 @@ export class ShopService {
         .exec(),
     ]);
 
-    return createApiResponse('Shop retrieved successfully.', omitInternalFields({
-      categories,
-      featuredProducts,
-    }));
+    return createApiResponse(
+      'Shop retrieved successfully.',
+      omitInternalFields({
+        categories,
+        featuredProducts,
+      }),
+    );
   }
 
   async findPublicProducts(
@@ -302,7 +315,7 @@ export class ShopService {
 
   async findPublicProductBySlug(
     slug: string,
-  ): Promise<ApiResponse<{ product: PlainProduct; relatedProducts: PlainProduct[] }>> {
+  ): Promise<ApiResponse<PlainProduct>> {
     const product = await this.productModel
       .findOne({ slug, isActive: true })
       .populate('category')
@@ -313,22 +326,10 @@ export class ShopService {
       throw new NotFoundException('Product not found.');
     }
 
-    const relatedProducts = await this.productModel
-      .find({
-        _id: { $ne: product._id },
-        category: this.extractCategoryId(product.category),
-        isActive: true,
-      })
-      .sort({ createdAt: -1 })
-      .limit(4)
-      .populate('category')
-      .lean<PlainProduct[]>()
-      .exec();
-
-    return createApiResponse('Product retrieved successfully.', omitInternalFields({
-      product,
-      relatedProducts,
-    }));
+    return createApiResponse(
+      'Product retrieved successfully.',
+      omitInternalFields(product),
+    );
   }
 
   async createProductReview(
@@ -350,10 +351,15 @@ export class ShopService {
       rating: dto.rating,
       name: dto.name.trim(),
       email: dto.email.toLowerCase().trim(),
-      reviewText: dto.reviewText.trim(),
+      comment: dto.comment.trim(),
     });
 
-    return createApiResponse('Review submitted successfully.', review.toObject());
+    await this.refreshProductRatingStats(product._id);
+
+    return createApiResponse(
+      'Review submitted successfully.',
+      review.toObject(),
+    );
   }
 
   async findProductReviewsBySlug(
@@ -465,10 +471,7 @@ export class ShopService {
     const filter: QueryFilter<ProductDocument> = {};
 
     if (query.category) {
-      filter.category = toObjectId(
-        query.category,
-        'Category id is invalid.',
-      );
+      filter.category = toObjectId(query.category, 'Category id is invalid.');
     }
 
     return this.applyProductSearchAndFeaturedFilter(filter, query);
@@ -599,14 +602,31 @@ export class ShopService {
     return slug;
   }
 
-  private extractCategoryId(
-    category?: Types.ObjectId | PlainCategory,
-  ): Types.ObjectId | undefined {
-    if (!category) {
-      return undefined;
-    }
+  private async refreshProductRatingStats(
+    productId: Types.ObjectId,
+  ): Promise<void> {
+    const [stats] = await this.reviewModel
+      .aggregate<{
+        _id: Types.ObjectId;
+        averageRating: number;
+        reviewCount: number;
+      }>([
+        { $match: { product: productId } },
+        {
+          $group: {
+            _id: '$product',
+            averageRating: { $avg: '$rating' },
+            reviewCount: { $sum: 1 },
+          },
+        },
+      ])
+      .exec();
 
-    return category instanceof Types.ObjectId ? category : category._id;
+    await this.productModel
+      .findByIdAndUpdate(productId, {
+        averageRating: stats ? Number(stats.averageRating.toFixed(2)) : 0,
+        reviewCount: stats?.reviewCount ?? 0,
+      })
+      .exec();
   }
-
 }

@@ -7,19 +7,19 @@ export type ReviewDocument = HydratedDocument<Review>;
 @Schema({ timestamps: true })
 export class Review {
   @Prop({ required: true, type: Types.ObjectId, ref: Product.name })
-  product: Types.ObjectId;
+  product!: Types.ObjectId;
 
   @Prop({ required: true, min: 1, max: 5 })
-  rating: number;
+  rating!: number;
 
   @Prop({ required: true, trim: true })
-  name: string;
+  name!: string;
 
   @Prop({ required: true, lowercase: true, trim: true })
-  email: string;
+  email!: string;
 
   @Prop({ required: true, trim: true })
-  reviewText: string;
+  comment!: string;
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);

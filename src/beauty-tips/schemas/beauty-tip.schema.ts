@@ -6,40 +6,40 @@ export type BeautyTipDocument = HydratedDocument<BeautyTip>;
 @Schema({ timestamps: true })
 export class BeautyTip {
   @Prop({ required: true, trim: true })
-  title: string;
+  title!: string;
 
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
-  slug: string;
+  slug!: string;
 
   @Prop({ required: true, trim: true })
-  category: string;
+  category!: string;
 
   @Prop({ required: true, lowercase: true, trim: true })
-  categorySlug: string;
+  categorySlug!: string;
 
   @Prop({ required: true, trim: true })
-  level: string;
+  level!: string;
 
   @Prop({ required: true, trim: true })
-  summary: string;
+  summary!: string;
 
   @Prop({ required: true, trim: true })
-  content: string;
+  content!: string;
 
   @Prop({ required: true, min: 1 })
-  readTimeMinutes: number;
+  readTimeMinutes!: number;
 
   @Prop({ trim: true })
   image?: string;
 
   @Prop({ type: [String], default: [] })
-  tags: string[];
+  tags!: string[];
 
   @Prop({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @Prop({ default: 0 })
-  order: number;
+  order!: number;
 }
 
 export const BeautyTipSchema = SchemaFactory.createForClass(BeautyTip);

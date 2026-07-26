@@ -31,6 +31,8 @@ export const productExample = {
   stock: 25,
   sku: 'SERA-CREAM-001',
   tags: ['face', 'cream', 'hydrating'],
+  averageRating: 4.5,
+  reviewCount: 12,
   isFeatured: true,
   createdAt: '2026-07-14T10:00:00.000Z',
   updatedAt: '2026-07-14T10:00:00.000Z',
@@ -42,7 +44,7 @@ export const reviewExample = {
   rating: 5,
   name: 'Jane Doe',
   email: 'jane@example.com',
-  reviewText: 'This product feels lovely and worked well for my skin.',
+  comment: 'This product feels lovely and worked well for my skin.',
   createdAt: '2026-07-14T10:00:00.000Z',
   updatedAt: '2026-07-14T10:00:00.000Z',
 };
@@ -86,25 +88,15 @@ export const lifestyleArticleExample = {
 
 export const serapheModelExample = {
   _id: '6690f3f5e7f9c1a001234573',
-  name: 'Amina Bello',
-  slug: 'amina-bello',
-  category: 'Top Icons',
-  categorySlug: 'top-icons',
-  badge: 'Industry Icon',
-  location: 'Seraphé Elite (Lagos)',
-  portfolioSummary: 'Vogue, Chanel, Seraphé Editorial Autumn',
+  height: '179 cm / 5\'10.5"',
+  specialty: 'Editorial beauty',
   bio: 'Amina is a Lagos-based model known for editorial beauty work.',
-  height: "179 cm / 5'10.5\"",
-  bust: '81 cm',
-  waist: '60 cm',
+  hobbies: ['skincare', 'runway', 'photography'],
   featureImage: 'https://cdn.seraphebeauty.org/models/amina-feature.jpg',
   images: [
     'https://cdn.seraphebeauty.org/models/amina-1.jpg',
     'https://cdn.seraphebeauty.org/models/amina-2.jpg',
   ],
-  tags: ['editorial', 'beauty', 'runway'],
-  isFeatured: true,
-  order: 1,
   createdAt: '2026-07-14T10:00:00.000Z',
   updatedAt: '2026-07-14T10:00:00.000Z',
 };
@@ -194,10 +186,7 @@ export const shopHomeResponseExample = successResponseExample(
 
 export const productDetailResponseExample = successResponseExample(
   'Product retrieved successfully.',
-  {
-    product: productExample,
-    relatedProducts: [productExample],
-  },
+  productExample,
 );
 
 export const beautyTipCategoriesResponseExample = successResponseExample(
@@ -218,14 +207,8 @@ export const lifestyleCategoriesResponseExample = successResponseExample(
 );
 
 export const serapheModelCategoriesResponseExample = successResponseExample(
-  'Seraphé model categories retrieved successfully.',
-  [
-    { name: 'All', slug: 'all' },
-    { name: 'Top Icons', slug: 'top-icons' },
-    { name: 'The Hot List', slug: 'the-hot-list' },
-    { name: 'New Faces', slug: 'new-faces' },
-    { name: 'Runway Elite', slug: 'runway-elite' },
-  ],
+  'Seraphe model categories retrieved successfully.',
+  [],
 );
 
 export const trendFocusAreasResponseExample = successResponseExample(

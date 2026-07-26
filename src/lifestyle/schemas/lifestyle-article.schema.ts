@@ -6,43 +6,43 @@ export type LifestyleArticleDocument = HydratedDocument<LifestyleArticle>;
 @Schema({ timestamps: true })
 export class LifestyleArticle {
   @Prop({ required: true, trim: true })
-  title: string;
+  title!: string;
 
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
-  slug: string;
+  slug!: string;
 
   @Prop({ required: true, trim: true })
-  category: string;
+  category!: string;
 
   @Prop({ required: true, lowercase: true, trim: true })
-  categorySlug: string;
+  categorySlug!: string;
 
   @Prop({ required: true, trim: true })
-  excerpt: string;
+  excerpt!: string;
 
   @Prop({ required: true, trim: true })
-  content: string;
+  content!: string;
 
   @Prop({ required: true, trim: true })
-  author: string;
+  author!: string;
 
   @Prop({ required: true, min: 1 })
-  readTimeMinutes: number;
+  readTimeMinutes!: number;
 
   @Prop({ trim: true })
   image?: string;
 
   @Prop({ type: [String], default: [] })
-  tags: string[];
+  tags!: string[];
 
   @Prop({ default: false })
-  isFeatured: boolean;
+  isFeatured!: boolean;
 
   @Prop({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @Prop({ default: 0 })
-  order: number;
+  order!: number;
 }
 
 export const LifestyleArticleSchema =
@@ -52,4 +52,8 @@ LifestyleArticleSchema.index({ categorySlug: 1 });
 LifestyleArticleSchema.index({ isActive: 1 });
 LifestyleArticleSchema.index({ isFeatured: 1 });
 LifestyleArticleSchema.index({ order: 1 });
-LifestyleArticleSchema.index({ title: 'text', excerpt: 'text', content: 'text' });
+LifestyleArticleSchema.index({
+  title: 'text',
+  excerpt: 'text',
+  content: 'text',
+});

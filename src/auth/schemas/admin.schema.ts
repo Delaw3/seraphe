@@ -6,13 +6,13 @@ export type AdminDocument = HydratedDocument<Admin>;
 @Schema({ timestamps: true })
 export class Admin {
   @Prop({ required: true, trim: true })
-  name: string;
+  name!: string;
 
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
-  email: string;
+  email!: string;
 
   @Prop({ required: true })
-  passwordHash: string;
+  passwordHash!: string;
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin);

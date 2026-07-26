@@ -37,7 +37,7 @@ export class PublicSerapheModelsController {
     return this.serapheModelsService.findPublicCategories();
   }
 
-  @Get(':slug')
+  @Get(':id')
   @ApiOkResponse({
     description: 'Get one active Seraphé model profile.',
     schema: {
@@ -47,7 +47,7 @@ export class PublicSerapheModelsController {
       ),
     },
   })
-  findModel(@Param('slug') slug: string) {
-    return this.serapheModelsService.findPublicModelBySlug(slug);
+  findModel(@Param('id') id: string) {
+    return this.serapheModelsService.findPublicModelById(id);
   }
 }

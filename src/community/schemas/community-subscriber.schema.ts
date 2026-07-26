@@ -1,19 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-export type CommunitySubscriberDocument =
-  HydratedDocument<CommunitySubscriber>;
+export type CommunitySubscriberDocument = HydratedDocument<CommunitySubscriber>;
 
 @Schema({ timestamps: true })
 export class CommunitySubscriber {
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
-  email: string;
+  email!: string;
 
   @Prop({ trim: true })
   name?: string;
 
   @Prop({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @Prop()
   subscribedAt?: Date;

@@ -34,11 +34,11 @@ export class TeamService {
   ): Promise<ApiResponse<PlainTeamMember>> {
     const member = await this.teamMemberModel.create({
       ...dto,
-      name: dto.name.trim(),
-      role: dto.role.trim(),
-      section: dto.section.trim(),
-      sectionSlug: slugify(dto.section),
-      image: dto.image.trim(),
+      name: dto.name?.trim(),
+      role: dto.role?.trim(),
+      section: dto.section?.trim(),
+      sectionSlug: dto.section ? slugify(dto.section) : undefined,
+      image: dto.image?.trim(),
       bio: dto.bio?.trim(),
       email: dto.email?.toLowerCase().trim(),
       linkedin: dto.linkedin?.trim(),
@@ -47,7 +47,10 @@ export class TeamService {
       order: dto.order ?? 0,
     });
 
-    return createApiResponse('Team member created successfully.', member.toObject());
+    return createApiResponse(
+      'Team member created successfully.',
+      member.toObject(),
+    );
   }
 
   async findAdminMembers(
@@ -83,7 +86,9 @@ export class TeamService {
       .exec();
 
     const sections = members.reduce<TeamSection[]>((groups, member) => {
-      const existing = groups.find((group) => group.slug === member.sectionSlug);
+      const sectionName = member.section ?? 'Team';
+      const sectionSlug = member.sectionSlug ?? 'team';
+      const existing = groups.find((group) => group.slug === sectionSlug);
 
       if (existing) {
         existing.members.push(omitInternalFields(member));
@@ -91,8 +96,8 @@ export class TeamService {
       }
 
       groups.push({
-        name: member.section,
-        slug: member.sectionSlug,
+        name: sectionName,
+        slug: sectionSlug,
         members: [omitInternalFields(member)],
       });
 
@@ -120,7 +125,10 @@ export class TeamService {
     dto: UpdateTeamMemberDto,
   ): Promise<ApiResponse<PlainTeamMember>> {
     const memberId = toObjectId(id, 'Team member id is invalid.');
-    const existing = await this.teamMemberModel.findById(memberId).lean().exec();
+    const existing = await this.teamMemberModel
+      .findById(memberId)
+      .lean()
+      .exec();
 
     if (!existing) {
       throw new NotFoundException('Team member not found.');
@@ -174,7 +182,7 @@ export class TeamService {
   > {
     const sections = await this.teamMemberModel
       .aggregate<{ name: string; slug: string }>([
-        { $match: { isActive: true } },
+        { $match: { isActive: true, sectionSlug: { $exists: true } } },
         {
           $group: {
             _id: '$sectionSlug',
@@ -236,6 +244,7 @@ export class TeamService {
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },
         { role: { $regex: search, $options: 'i' } },
+        { section: { $regex: search, $options: 'i' } },
         { bio: { $regex: search, $options: 'i' } },
       ];
     }

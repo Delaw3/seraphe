@@ -6,16 +6,16 @@ export type TrendDocument = HydratedDocument<Trend>;
 @Schema({ timestamps: true })
 export class Trend {
   @Prop({ required: true, trim: true })
-  title: string;
+  title!: string;
 
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
-  slug: string;
+  slug!: string;
 
   @Prop({ required: true, trim: true })
-  focusArea: string;
+  focusArea!: string;
 
   @Prop({ required: true, lowercase: true, trim: true })
-  focusAreaSlug: string;
+  focusAreaSlug!: string;
 
   @Prop({ trim: true })
   label?: string;
@@ -24,37 +24,37 @@ export class Trend {
   subtitle?: string;
 
   @Prop({ required: true, trim: true })
-  excerpt: string;
+  excerpt!: string;
 
   @Prop({ required: true, trim: true })
-  content: string;
+  content!: string;
 
   @Prop({ trim: true })
   author?: string;
 
   @Prop({ required: true, trim: true })
-  featureImage: string;
+  featureImage!: string;
 
   @Prop({ type: [String], default: [] })
-  images: string[];
+  images!: string[];
 
   @Prop({ type: [String], default: [] })
-  hashtags: string[];
+  hashtags!: string[];
 
   @Prop({ required: true, min: 1 })
-  readTimeMinutes: number;
+  readTimeMinutes!: number;
 
   @Prop()
   publishedAt?: Date;
 
   @Prop({ default: false })
-  isFeatured: boolean;
+  isFeatured!: boolean;
 
   @Prop({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @Prop({ default: 0 })
-  order: number;
+  order!: number;
 }
 
 export const TrendSchema = SchemaFactory.createForClass(Trend);

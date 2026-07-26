@@ -24,5 +24,5 @@ export class CreateReviewDto {
   })
   @IsString()
   @MinLength(5)
-  reviewText: string;
+  comment: string;
 }

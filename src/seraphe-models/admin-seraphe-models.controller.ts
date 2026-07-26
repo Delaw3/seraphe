@@ -93,7 +93,7 @@ export class AdminSerapheModelsController {
 
   @Delete(':id')
   @ApiOkResponse({
-    description: 'Soft delete a Seraphé model profile.',
+    description: 'Delete a Seraphé model profile.',
     schema: {
       example: successResponseExample(
         'Seraphé model deleted successfully.',

@@ -6,10 +6,10 @@ export type CategoryDocument = HydratedDocument<Category>;
 @Schema({ timestamps: true })
 export class Category {
   @Prop({ required: true, trim: true })
-  name: string;
+  name!: string;
 
   @Prop({ required: true, lowercase: true, trim: true })
-  slug: string;
+  slug!: string;
 
   @Prop({ trim: true })
   description?: string;
@@ -18,10 +18,10 @@ export class Category {
   image?: string;
 
   @Prop({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @Prop({ default: 0 })
-  order: number;
+  order!: number;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

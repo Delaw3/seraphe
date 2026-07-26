@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsEmail,
@@ -11,24 +11,30 @@ import {
 } from 'class-validator';
 
 export class CreateTeamMemberDto {
-  @ApiProperty({ example: 'Jane Doe' })
+  @ApiPropertyOptional({ example: 'Jane Doe' })
+  @IsOptional()
   @IsString()
   @MinLength(2)
-  name: string;
+  name?: string;
 
-  @ApiProperty({ example: 'Managing Director' })
+  @ApiPropertyOptional({ example: 'Managing Director' })
+  @IsOptional()
   @IsString()
   @MinLength(2)
-  role: string;
+  role?: string;
 
-  @ApiProperty({ example: 'Beauty Science Team' })
+  @ApiPropertyOptional({ example: 'Beauty Science Team' })
+  @IsOptional()
   @IsString()
   @MinLength(2)
-  section: string;
+  section?: string;
 
-  @ApiProperty({ example: 'https://cdn.seraphebeauty.org/team/jane-doe.jpg' })
+  @ApiPropertyOptional({
+    example: 'https://cdn.seraphebeauty.org/team/jane-doe.jpg',
+  })
+  @IsOptional()
   @IsUrl()
-  image: string;
+  image?: string;
 
   @ApiPropertyOptional({
     example: 'Jane leads product research and beauty science strategy.',

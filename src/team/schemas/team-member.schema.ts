@@ -5,20 +5,20 @@ export type TeamMemberDocument = HydratedDocument<TeamMember>;
 
 @Schema({ timestamps: true })
 export class TeamMember {
-  @Prop({ required: true, trim: true })
-  name: string;
+  @Prop({ trim: true })
+  name?: string;
 
-  @Prop({ required: true, trim: true })
-  role: string;
+  @Prop({ trim: true })
+  role?: string;
 
-  @Prop({ required: true, trim: true })
-  section: string;
+  @Prop({ trim: true })
+  section?: string;
 
-  @Prop({ required: true, lowercase: true, trim: true })
-  sectionSlug: string;
+  @Prop({ lowercase: true, trim: true })
+  sectionSlug?: string;
 
-  @Prop({ required: true, trim: true })
-  image: string;
+  @Prop({ trim: true })
+  image?: string;
 
   @Prop({ trim: true })
   bio?: string;
@@ -33,10 +33,10 @@ export class TeamMember {
   instagram?: string;
 
   @Prop({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @Prop({ default: 0 })
-  order: number;
+  order!: number;
 }
 
 export const TeamMemberSchema = SchemaFactory.createForClass(TeamMember);

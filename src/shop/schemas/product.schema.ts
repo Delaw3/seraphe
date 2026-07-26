@@ -7,43 +7,49 @@ export type ProductDocument = HydratedDocument<Product>;
 @Schema({ timestamps: true })
 export class Product {
   @Prop({ required: true, trim: true })
-  name: string;
+  name!: string;
 
   @Prop({ required: true, lowercase: true, trim: true })
-  slug: string;
+  slug!: string;
 
   @Prop({ required: true, trim: true })
-  shortDescription: string;
+  shortDescription!: string;
 
   @Prop({ required: true, trim: true })
-  description: string;
+  description!: string;
 
   @Prop({ required: true, type: Types.ObjectId, ref: Category.name })
-  category: Types.ObjectId;
+  category!: Types.ObjectId;
 
   @Prop({ required: true, min: 0 })
-  price: number;
+  price!: number;
 
   @Prop({ min: 0 })
   discountPrice?: number;
 
   @Prop({ type: [String], default: [] })
-  images: string[];
+  images!: string[];
 
   @Prop({ required: true, min: 0, default: 0 })
-  stock: number;
+  stock!: number;
 
   @Prop({ trim: true })
   sku?: string;
 
   @Prop({ type: [String], default: [] })
-  tags: string[];
+  tags!: string[];
+
+  @Prop({ min: 0, max: 5, default: 0 })
+  averageRating!: number;
+
+  @Prop({ min: 0, default: 0 })
+  reviewCount!: number;
 
   @Prop({ default: false })
-  isFeatured: boolean;
+  isFeatured!: boolean;
 
   @Prop({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
