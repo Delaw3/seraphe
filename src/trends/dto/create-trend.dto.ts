@@ -36,7 +36,7 @@ export class CreateTrendDto {
   @ApiProperty({ example: 'The Rise of Neurocosmetics' })
   @IsString()
   @MinLength(3)
-  title: string;
+  title!: string;
 
   @ApiHideProperty()
   @Transform(({ value }) =>
@@ -50,7 +50,7 @@ export class CreateTrendDto {
   @ApiProperty({ example: 'Skincare' })
   @IsString()
   @MinLength(2)
-  focusArea: string;
+  focusArea!: string;
 
   @ApiPropertyOptional({ example: 'Trending Now' })
   @IsOptional()
@@ -68,12 +68,12 @@ export class CreateTrendDto {
   })
   @IsString()
   @MinLength(10)
-  excerpt: string;
+  excerpt!: string;
 
   @ApiProperty({ example: 'Full trend analysis content.' })
   @IsString()
   @MinLength(20)
-  content: string;
+  content!: string;
 
   @ApiPropertyOptional({ example: 'Seraphe Editorial' })
   @IsOptional()
@@ -84,7 +84,7 @@ export class CreateTrendDto {
     example: 'https://cdn.seraphebeauty.org/trends/neurocosmetics.jpg',
   })
   @IsUrl()
-  featureImage: string;
+  featureImage!: string;
 
   @ApiPropertyOptional({
     example: [
@@ -113,7 +113,7 @@ export class CreateTrendDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  readTimeMinutes: number;
+  readTimeMinutes!: number;
 
   @ApiPropertyOptional({ example: '2026-06-01T00:00:00.000Z' })
   @IsOptional()

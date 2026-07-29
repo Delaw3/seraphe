@@ -76,7 +76,7 @@ export class ShopService {
 
   async findAdminCategories(): Promise<ApiResponse<PlainCategory[]>> {
     const categories = await this.categoryModel
-      .find()
+      .find({ isActive: true })
       .sort({ order: 1, createdAt: -1 })
       .lean<PlainCategory[]>()
       .exec();
@@ -98,7 +98,7 @@ export class ShopService {
   }
 
   async findAdminCategory(id: string): Promise<ApiResponse<PlainCategory>> {
-    const category = await this.findCategoryById(id);
+    const category = await this.findCategoryById(id, true);
     return createApiResponse('Category retrieved successfully.', category);
   }
 
@@ -106,7 +106,7 @@ export class ShopService {
     id: string,
     dto: UpdateCategoryDto,
   ): Promise<ApiResponse<PlainCategory>> {
-    const existing = await this.findCategoryById(id);
+    const existing = await this.findCategoryById(id, true);
     const update: Partial<Category> = { ...dto };
 
     if (dto.name) {
@@ -139,7 +139,11 @@ export class ShopService {
   async deleteCategory(id: string): Promise<ApiResponse<PlainCategory>> {
     const categoryId = toObjectId(id, 'Category id is invalid.');
     const category = await this.categoryModel
-      .findByIdAndUpdate(categoryId, { isActive: false }, { new: true })
+      .findOneAndUpdate(
+        { _id: categoryId, isActive: true },
+        { isActive: false },
+        { new: true },
+      )
       .lean<PlainCategory>()
       .exec();
 
@@ -194,7 +198,7 @@ export class ShopService {
   async findAdminProduct(id: string): Promise<ApiResponse<PlainProduct>> {
     const productId = toObjectId(id, 'Product id is invalid.');
     const product = await this.productModel
-      .findById(productId)
+      .findOne({ _id: productId, isActive: true })
       .populate('category')
       .lean<PlainProduct>()
       .exec();
@@ -211,7 +215,10 @@ export class ShopService {
     dto: UpdateProductDto,
   ): Promise<ApiResponse<PlainProduct>> {
     const productId = toObjectId(id, 'Product id is invalid.');
-    const existing = await this.productModel.findById(productId).lean().exec();
+    const existing = await this.productModel
+      .findOne({ _id: productId, isActive: true })
+      .lean()
+      .exec();
 
     if (!existing) {
       throw new NotFoundException('Product not found.');
@@ -253,7 +260,11 @@ export class ShopService {
   async deleteProduct(id: string): Promise<ApiResponse<PlainProduct>> {
     const productId = toObjectId(id, 'Product id is invalid.');
     const product = await this.productModel
-      .findByIdAndUpdate(productId, { isActive: false }, { new: true })
+      .findOneAndUpdate(
+        { _id: productId, isActive: true },
+        { isActive: false },
+        { new: true },
+      )
       .populate('category')
       .lean<PlainProduct>()
       .exec();
@@ -468,7 +479,7 @@ export class ShopService {
   private buildAdminProductFilter(
     query: AdminQueryProductsDto,
   ): QueryFilter<ProductDocument> {
-    const filter: QueryFilter<ProductDocument> = {};
+    const filter: QueryFilter<ProductDocument> = { isActive: true };
 
     if (query.category) {
       filter.category = toObjectId(query.category, 'Category id is invalid.');
@@ -516,10 +527,19 @@ export class ShopService {
     return filter;
   }
 
-  private async findCategoryById(id: string): Promise<PlainCategory> {
+  private async findCategoryById(
+    id: string,
+    activeOnly = false,
+  ): Promise<PlainCategory> {
     const categoryId = toObjectId(id, 'Category id is invalid.');
+    const filter: QueryFilter<CategoryDocument> = { _id: categoryId };
+
+    if (activeOnly) {
+      filter.isActive = true;
+    }
+
     const category = await this.categoryModel
-      .findById(categoryId)
+      .findOne(filter)
       .lean<PlainCategory>()
       .exec();
 

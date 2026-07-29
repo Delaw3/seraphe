@@ -60,7 +60,10 @@ export const beautyTipExample = {
     'A targeted guide on using salicylic acid and niacinamide effectively.',
   content: 'Full guide content for the beauty tip.',
   readTimeMinutes: 4,
-  image: 'https://cdn.seraphebeauty.org/tips/acne.jpg',
+  images: [
+    'https://cdn.seraphebeauty.org/tips/acne-1.jpg',
+    'https://cdn.seraphebeauty.org/tips/acne-2.jpg',
+  ],
   tags: ['acne', 'salicylic acid'],
   order: 1,
   createdAt: '2026-07-14T10:00:00.000Z',
@@ -88,6 +91,7 @@ export const lifestyleArticleExample = {
 
 export const serapheModelExample = {
   _id: '6690f3f5e7f9c1a001234573',
+  name: 'Amina Bello',
   height: '179 cm / 5\'10.5"',
   specialty: 'Editorial beauty',
   bio: 'Amina is a Lagos-based model known for editorial beauty work.',

@@ -5,14 +5,14 @@ export class SignUpDto {
   @ApiProperty({ example: 'Seraphe Admin' })
   @IsString()
   @MinLength(2)
-  name: string;
+  name!: string;
 
   @ApiProperty({ example: 'admin@seraphebeauty.org' })
   @IsEmail()
-  email: string;
+  email!: string;
 
   @ApiProperty({ example: 'StrongPassword123' })
   @IsString()
   @MinLength(8)
-  password: string;
+  password!: string;
 }

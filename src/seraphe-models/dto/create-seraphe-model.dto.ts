@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  MinLength,
 } from 'class-validator';
 
 const toStringArray = (value: unknown) => {
@@ -24,6 +25,11 @@ const toStringArray = (value: unknown) => {
 };
 
 export class CreateSerapheModelDto {
+  @ApiProperty({ example: 'Amina Bello' })
+  @IsString()
+  @MinLength(2)
+  name!: string;
+
   @ApiPropertyOptional({ example: '179 cm / 5\'10.5"' })
   @IsOptional()
   @IsString()
@@ -53,7 +59,7 @@ export class CreateSerapheModelDto {
     example: 'https://cdn.seraphebeauty.org/models/amina-feature.jpg',
   })
   @IsUrl()
-  featureImage: string;
+  featureImage!: string;
 
   @ApiPropertyOptional({
     example: [

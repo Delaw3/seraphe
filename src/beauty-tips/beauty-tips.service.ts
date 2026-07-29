@@ -18,10 +18,7 @@ import {
 import { CreateBeautyTipDto } from './dto/create-beauty-tip.dto';
 import { QueryBeautyTipsDto } from './dto/query-beauty-tips.dto';
 import { UpdateBeautyTipDto } from './dto/update-beauty-tip.dto';
-import {
-  BeautyTip,
-  BeautyTipDocument,
-} from './schemas/beauty-tip.schema';
+import { BeautyTip, BeautyTipDocument } from './schemas/beauty-tip.schema';
 
 type PlainBeautyTip = BeautyTip & { _id: Types.ObjectId };
 
@@ -32,7 +29,9 @@ export class BeautyTipsService {
     private readonly beautyTipModel: Model<BeautyTipDocument>,
   ) {}
 
-  async createTip(dto: CreateBeautyTipDto): Promise<ApiResponse<PlainBeautyTip>> {
+  async createTip(
+    dto: CreateBeautyTipDto,
+  ): Promise<ApiResponse<PlainBeautyTip>> {
     const slug = await this.resolveUniqueSlug(dto.slug?.trim() || dto.title);
     const tip = await this.beautyTipModel.create({
       ...dto,
@@ -43,19 +42,23 @@ export class BeautyTipsService {
       level: dto.level.trim(),
       summary: dto.summary.trim(),
       content: dto.content.trim(),
+      images: dto.images ?? [],
       tags: dto.tags ?? [],
       isActive: true,
       order: dto.order ?? 0,
     });
 
-    return createApiResponse('Beauty tip created successfully.', tip.toObject());
+    return createApiResponse(
+      'Beauty tip created successfully.',
+      tip.toObject(),
+    );
   }
 
   async findAdminTips(
     query: QueryBeautyTipsDto,
   ): Promise<ApiResponse<PlainBeautyTip[]>> {
     return this.paginateTips(
-      this.buildTipFilter(query),
+      this.buildTipFilter(query, true),
       query,
       'Beauty tips retrieved successfully.',
     );
@@ -78,7 +81,10 @@ export class BeautyTipsService {
 
   async findAdminTip(id: string): Promise<ApiResponse<PlainBeautyTip>> {
     const tip = await this.beautyTipModel
-      .findById(toObjectId(id, 'Beauty tip id is invalid.'))
+      .findOne({
+        _id: toObjectId(id, 'Beauty tip id is invalid.'),
+        isActive: true,
+      })
       .lean<PlainBeautyTip>()
       .exec();
 
@@ -92,7 +98,9 @@ export class BeautyTipsService {
     );
   }
 
-  async findPublicTipBySlug(slug: string): Promise<ApiResponse<PlainBeautyTip>> {
+  async findPublicTipBySlug(
+    slug: string,
+  ): Promise<ApiResponse<PlainBeautyTip>> {
     const tip = await this.beautyTipModel
       .findOne({ slug, isActive: true })
       .lean<PlainBeautyTip>()
@@ -110,7 +118,10 @@ export class BeautyTipsService {
     dto: UpdateBeautyTipDto,
   ): Promise<ApiResponse<PlainBeautyTip>> {
     const tipId = toObjectId(id, 'Beauty tip id is invalid.');
-    const existing = await this.beautyTipModel.findById(tipId).lean().exec();
+    const existing = await this.beautyTipModel
+      .findOne({ _id: tipId, isActive: true })
+      .lean()
+      .exec();
 
     if (!existing) {
       throw new NotFoundException('Beauty tip not found.');
@@ -147,7 +158,11 @@ export class BeautyTipsService {
   async deleteTip(id: string): Promise<ApiResponse<PlainBeautyTip>> {
     const tipId = toObjectId(id, 'Beauty tip id is invalid.');
     const tip = await this.beautyTipModel
-      .findByIdAndUpdate(tipId, { isActive: false }, { new: true })
+      .findOneAndUpdate(
+        { _id: tipId, isActive: true },
+        { isActive: false },
+        { new: true },
+      )
       .lean<PlainBeautyTip>()
       .exec();
 

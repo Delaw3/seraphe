@@ -57,7 +57,7 @@ export class TrendsService {
     query: QueryTrendsDto,
   ): Promise<ApiResponse<PlainTrend[]>> {
     return this.paginateTrends(
-      this.buildTrendFilter(query),
+      this.buildTrendFilter(query, true),
       query,
       'Trends retrieved successfully.',
     );
@@ -80,7 +80,10 @@ export class TrendsService {
 
   async findAdminTrend(id: string): Promise<ApiResponse<PlainTrend>> {
     const trend = await this.trendModel
-      .findById(toObjectId(id, 'Trend id is invalid.'))
+      .findOne({
+        _id: toObjectId(id, 'Trend id is invalid.'),
+        isActive: true,
+      })
       .lean<PlainTrend>()
       .exec();
 
@@ -112,7 +115,10 @@ export class TrendsService {
     dto: UpdateTrendDto,
   ): Promise<ApiResponse<PlainTrend>> {
     const trendId = toObjectId(id, 'Trend id is invalid.');
-    const existing = await this.trendModel.findById(trendId).lean().exec();
+    const existing = await this.trendModel
+      .findOne({ _id: trendId, isActive: true })
+      .lean()
+      .exec();
 
     if (!existing) {
       throw new NotFoundException('Trend not found.');
@@ -152,7 +158,11 @@ export class TrendsService {
   async deleteTrend(id: string): Promise<ApiResponse<PlainTrend>> {
     const trendId = toObjectId(id, 'Trend id is invalid.');
     const trend = await this.trendModel
-      .findByIdAndUpdate(trendId, { isActive: false }, { new: true })
+      .findOneAndUpdate(
+        { _id: trendId, isActive: true },
+        { isActive: false },
+        { new: true },
+      )
       .lean<PlainTrend>()
       .exec();
 

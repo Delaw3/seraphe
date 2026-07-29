@@ -60,7 +60,7 @@ export class LifestyleService {
     query: QueryLifestyleArticlesDto,
   ): Promise<ApiResponse<PlainLifestyleArticle[]>> {
     return this.paginateArticles(
-      this.buildArticleFilter(query),
+      this.buildArticleFilter(query, true),
       query,
       'Lifestyle articles retrieved successfully.',
     );
@@ -85,7 +85,10 @@ export class LifestyleService {
     id: string,
   ): Promise<ApiResponse<PlainLifestyleArticle>> {
     const article = await this.lifestyleArticleModel
-      .findById(toObjectId(id, 'Lifestyle article id is invalid.'))
+      .findOne({
+        _id: toObjectId(id, 'Lifestyle article id is invalid.'),
+        isActive: true,
+      })
       .lean<PlainLifestyleArticle>()
       .exec();
 
@@ -123,7 +126,7 @@ export class LifestyleService {
   ): Promise<ApiResponse<PlainLifestyleArticle>> {
     const articleId = toObjectId(id, 'Lifestyle article id is invalid.');
     const existing = await this.lifestyleArticleModel
-      .findById(articleId)
+      .findOne({ _id: articleId, isActive: true })
       .lean()
       .exec();
 
@@ -168,13 +171,20 @@ export class LifestyleService {
       throw new NotFoundException('Lifestyle article not found.');
     }
 
-    return createApiResponse('Lifestyle article updated successfully.', article);
+    return createApiResponse(
+      'Lifestyle article updated successfully.',
+      article,
+    );
   }
 
   async deleteArticle(id: string): Promise<ApiResponse<PlainLifestyleArticle>> {
     const articleId = toObjectId(id, 'Lifestyle article id is invalid.');
     const article = await this.lifestyleArticleModel
-      .findByIdAndUpdate(articleId, { isActive: false }, { new: true })
+      .findOneAndUpdate(
+        { _id: articleId, isActive: true },
+        { isActive: false },
+        { new: true },
+      )
       .lean<PlainLifestyleArticle>()
       .exec();
 
@@ -182,7 +192,10 @@ export class LifestyleService {
       throw new NotFoundException('Lifestyle article not found.');
     }
 
-    return createApiResponse('Lifestyle article deleted successfully.', article);
+    return createApiResponse(
+      'Lifestyle article deleted successfully.',
+      article,
+    );
   }
 
   async findPublicCategories(): Promise<

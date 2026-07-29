@@ -29,8 +29,8 @@ export class BeautyTip {
   @Prop({ required: true, min: 1 })
   readTimeMinutes!: number;
 
-  @Prop({ trim: true })
-  image?: string;
+  @Prop({ type: [String], default: [] })
+  images!: string[];
 
   @Prop({ type: [String], default: [] })
   tags!: string[];

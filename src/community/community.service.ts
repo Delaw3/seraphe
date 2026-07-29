@@ -83,7 +83,10 @@ export class CommunityService {
     id: string,
   ): Promise<ApiResponse<PlainCommunitySubscriber>> {
     const subscriber = await this.subscriberModel
-      .findById(toObjectId(id, 'Community subscriber id is invalid.'))
+      .findOne({
+        _id: toObjectId(id, 'Community subscriber id is invalid.'),
+        isActive: true,
+      })
       .lean<PlainCommunitySubscriber>()
       .exec();
 
@@ -97,10 +100,15 @@ export class CommunityService {
     );
   }
 
-  async unsubscribe(id: string): Promise<ApiResponse<PlainCommunitySubscriber>> {
+  async unsubscribe(
+    id: string,
+  ): Promise<ApiResponse<PlainCommunitySubscriber>> {
     const subscriber = await this.subscriberModel
-      .findByIdAndUpdate(
-        toObjectId(id, 'Community subscriber id is invalid.'),
+      .findOneAndUpdate(
+        {
+          _id: toObjectId(id, 'Community subscriber id is invalid.'),
+          isActive: true,
+        },
         { isActive: false, unsubscribedAt: new Date() },
         { new: true },
       )
@@ -120,11 +128,9 @@ export class CommunityService {
   private buildSubscriberFilter(
     query: QueryCommunitySubscribersDto,
   ): QueryFilter<CommunitySubscriberDocument> {
-    const filter: QueryFilter<CommunitySubscriberDocument> = {};
-
-    if (typeof query.active === 'boolean') {
-      filter.isActive = query.active;
-    }
+    const filter: QueryFilter<CommunitySubscriberDocument> = {
+      isActive: true,
+    };
 
     if (query.search) {
       const search = query.search.trim();

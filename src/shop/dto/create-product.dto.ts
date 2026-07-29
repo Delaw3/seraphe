@@ -22,7 +22,7 @@ export class CreateProductDto {
   @ApiProperty({ example: 'Hydrating Face Cream' })
   @IsString()
   @MinLength(2)
-  name: string;
+  name!: string;
 
   @ApiHideProperty()
   @Transform(({ value }) =>
@@ -36,22 +36,22 @@ export class CreateProductDto {
   @ApiProperty({ example: 'A lightweight cream for daily hydration.' })
   @IsString()
   @MinLength(5)
-  shortDescription: string;
+  shortDescription!: string;
 
   @ApiProperty({ example: 'Full product description and usage details.' })
   @IsString()
   @MinLength(10)
-  description: string;
+  description!: string;
 
   @ApiProperty({ example: '66a1234567890abcdef12345' })
   @IsMongoId()
-  category: string;
+  category!: string;
 
   @ApiProperty({ example: 15000 })
   @Type(() => Number)
   @IsNumber()
   @Min(0.01)
-  price: number;
+  price!: number;
 
   @ApiPropertyOptional({ example: 12000 })
   @IsOptional()
@@ -87,7 +87,7 @@ export class CreateProductDto {
   @Type(() => Number)
   @IsInt()
   @Min(0)
-  stock: number;
+  stock!: number;
 
   @ApiPropertyOptional({ example: 'SERA-CREAM-001' })
   @IsOptional()

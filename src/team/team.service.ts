@@ -57,7 +57,7 @@ export class TeamService {
     query: QueryTeamMembersDto,
   ): Promise<ApiResponse<PlainTeamMember[]>> {
     return this.paginateMembers(
-      this.buildMemberFilter(query),
+      this.buildMemberFilter(query, true),
       query,
       'Team members retrieved successfully.',
     );
@@ -109,7 +109,10 @@ export class TeamService {
 
   async findAdminMember(id: string): Promise<ApiResponse<PlainTeamMember>> {
     const member = await this.teamMemberModel
-      .findById(toObjectId(id, 'Team member id is invalid.'))
+      .findOne({
+        _id: toObjectId(id, 'Team member id is invalid.'),
+        isActive: true,
+      })
       .lean<PlainTeamMember>()
       .exec();
 
@@ -126,7 +129,7 @@ export class TeamService {
   ): Promise<ApiResponse<PlainTeamMember>> {
     const memberId = toObjectId(id, 'Team member id is invalid.');
     const existing = await this.teamMemberModel
-      .findById(memberId)
+      .findOne({ _id: memberId, isActive: true })
       .lean()
       .exec();
 
@@ -162,8 +165,8 @@ export class TeamService {
 
   async deleteMember(id: string): Promise<ApiResponse<PlainTeamMember>> {
     const member = await this.teamMemberModel
-      .findByIdAndUpdate(
-        toObjectId(id, 'Team member id is invalid.'),
+      .findOneAndUpdate(
+        { _id: toObjectId(id, 'Team member id is invalid.'), isActive: true },
         { isActive: false },
         { new: true },
       )

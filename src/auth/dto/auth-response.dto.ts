@@ -2,19 +2,19 @@ import { ApiProperty } from '@nestjs/swagger';
 
 class AdminProfileDto {
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  name: string;
+  name!: string;
 
   @ApiProperty()
-  email: string;
+  email!: string;
 }
 
 export class AuthResponseDto {
   @ApiProperty()
-  accessToken: string;
+  accessToken!: string;
 
   @ApiProperty({ type: AdminProfileDto })
-  admin: AdminProfileDto;
+  admin!: AdminProfileDto;
 }

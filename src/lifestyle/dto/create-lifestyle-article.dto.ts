@@ -20,7 +20,7 @@ export class CreateLifestyleArticleDto {
   @ApiProperty({ example: 'Top 3 Regina Daniels Beauty Secrets' })
   @IsString()
   @MinLength(3)
-  title: string;
+  title!: string;
 
   @ApiHideProperty()
   @Transform(({ value }) =>
@@ -34,7 +34,7 @@ export class CreateLifestyleArticleDto {
   @ApiProperty({ example: 'Make-Up' })
   @IsString()
   @MinLength(2)
-  category: string;
+  category!: string;
 
   @ApiProperty({
     example:
@@ -42,23 +42,23 @@ export class CreateLifestyleArticleDto {
   })
   @IsString()
   @MinLength(10)
-  excerpt: string;
+  excerpt!: string;
 
   @ApiProperty({ example: 'Full lifestyle article content.' })
   @IsString()
   @MinLength(20)
-  content: string;
+  content!: string;
 
   @ApiProperty({ example: 'Ogunmola Gbemisola' })
   @IsString()
   @MinLength(2)
-  author: string;
+  author!: string;
 
   @ApiProperty({ example: 5 })
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  readTimeMinutes: number;
+  readTimeMinutes!: number;
 
   @ApiPropertyOptional({
     example: 'https://cdn.seraphebeauty.org/lifestyle/glowing-skin.jpg',

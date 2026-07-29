@@ -5,6 +5,9 @@ export type SerapheModelDocument = HydratedDocument<SerapheModel>;
 
 @Schema({ timestamps: true })
 export class SerapheModel {
+  @Prop({ required: true, trim: true })
+  name!: string;
+
   @Prop({ trim: true })
   height?: string;
 
@@ -26,4 +29,9 @@ export class SerapheModel {
 
 export const SerapheModelSchema = SchemaFactory.createForClass(SerapheModel);
 
-SerapheModelSchema.index({ specialty: 'text', bio: 'text', hobbies: 'text' });
+SerapheModelSchema.index({
+  name: 'text',
+  specialty: 'text',
+  bio: 'text',
+  hobbies: 'text',
+});

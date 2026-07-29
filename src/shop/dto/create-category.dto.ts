@@ -17,7 +17,7 @@ export class CreateCategoryDto {
   @ApiProperty({ example: 'Skincare' })
   @IsString()
   @MinLength(2)
-  name: string;
+  name!: string;
 
   @ApiHideProperty()
   @Transform(({ value }) =>
@@ -33,7 +33,9 @@ export class CreateCategoryDto {
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/categories/skincare.jpg' })
+  @ApiPropertyOptional({
+    example: 'https://example.com/categories/skincare.jpg',
+  })
   @IsOptional()
   @IsUrl()
   image?: string;

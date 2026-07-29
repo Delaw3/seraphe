@@ -29,6 +29,7 @@ export class SerapheModelsService {
     dto: CreateSerapheModelDto,
   ): Promise<ApiResponse<PlainSerapheModel>> {
     const model = await this.serapheModelModel.create({
+      name: dto.name.trim(),
       height: dto.height?.trim(),
       specialty: dto.specialty?.trim(),
       bio: dto.bio?.trim(),
@@ -115,6 +116,7 @@ export class SerapheModelsService {
 
     const update: Record<string, unknown> = { ...dto };
 
+    if (dto.name) update.name = dto.name.trim();
     if (dto.height) update.height = dto.height.trim();
     if (dto.specialty) update.specialty = dto.specialty.trim();
     if (dto.bio) update.bio = dto.bio.trim();
@@ -189,6 +191,7 @@ export class SerapheModelsService {
     if (query.search) {
       const search = query.search.trim();
       filter.$or = [
+        { name: { $regex: search, $options: 'i' } },
         { specialty: { $regex: search, $options: 'i' } },
         { bio: { $regex: search, $options: 'i' } },
         { hobbies: { $regex: search, $options: 'i' } },

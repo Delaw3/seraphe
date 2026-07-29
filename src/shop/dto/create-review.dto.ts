@@ -8,21 +8,21 @@ export class CreateReviewDto {
   @IsInt()
   @Min(1)
   @Max(5)
-  rating: number;
+  rating!: number;
 
   @ApiProperty({ example: 'Jane Doe' })
   @IsString()
   @MinLength(2)
-  name: string;
+  name!: string;
 
   @ApiProperty({ example: 'jane@example.com' })
   @IsEmail()
-  email: string;
+  email!: string;
 
   @ApiProperty({
     example: 'This product feels lovely and worked well for my skin.',
   })
   @IsString()
   @MinLength(5)
-  comment: string;
+  comment!: string;
 }

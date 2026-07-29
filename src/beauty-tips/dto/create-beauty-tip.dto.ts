@@ -19,7 +19,7 @@ export class CreateBeautyTipDto {
   @ApiProperty({ example: 'Managing Hormonal Acne Breakouts' })
   @IsString()
   @MinLength(3)
-  title: string;
+  title!: string;
 
   @ApiHideProperty()
   @Transform(({ value }) =>
@@ -33,12 +33,12 @@ export class CreateBeautyTipDto {
   @ApiProperty({ example: 'Acne' })
   @IsString()
   @MinLength(2)
-  category: string;
+  category!: string;
 
   @ApiProperty({ example: 'Beginner' })
   @IsString()
   @MinLength(2)
-  level: string;
+  level!: string;
 
   @ApiProperty({
     example:
@@ -46,23 +46,44 @@ export class CreateBeautyTipDto {
   })
   @IsString()
   @MinLength(10)
-  summary: string;
+  summary!: string;
 
   @ApiProperty({ example: 'Full guide content for the beauty tip.' })
   @IsString()
   @MinLength(20)
-  content: string;
+  content!: string;
 
   @ApiProperty({ example: 4 })
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  readTimeMinutes: number;
+  readTimeMinutes!: number;
 
-  @ApiPropertyOptional({ example: 'https://example.com/tips/acne.jpg' })
+  @ApiPropertyOptional({
+    example: [
+      'https://example.com/tips/acne-1.jpg',
+      'https://example.com/tips/acne-2.jpg',
+    ],
+  })
   @IsOptional()
-  @IsUrl()
-  image?: string;
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) {
+      return value.map((item) => String(item).trim()).filter(Boolean);
+    }
+
+    if (typeof value === 'string') {
+      return value
+        .split(/[\n,]+/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    return value;
+  })
+  @IsArray()
+  @ArrayMaxSize(12)
+  @IsUrl({}, { each: true })
+  images?: string[];
 
   @ApiPropertyOptional({ example: ['acne', 'salicylic acid'] })
   @IsOptional()
