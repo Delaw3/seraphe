@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type CommunitySubscriberDocument = HydratedDocument<CommunitySubscriber>;
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, versionKey: false })
 export class CommunitySubscriber {
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
   email!: string;

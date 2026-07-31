@@ -42,6 +42,7 @@ export class BeautyTipsService {
       level: dto.level.trim(),
       summary: dto.summary.trim(),
       content: dto.content.trim(),
+      author: dto.author?.trim(),
       images: dto.images ?? [],
       tags: dto.tags ?? [],
       isActive: true,
@@ -142,6 +143,7 @@ export class BeautyTipsService {
       update.category = dto.category.trim();
       update.categorySlug = slugify(dto.category);
     }
+    if (dto.author) update.author = dto.author.trim();
 
     const tip = await this.beautyTipModel
       .findByIdAndUpdate(tipId, update, { new: true })
@@ -244,6 +246,7 @@ export class BeautyTipsService {
         { title: { $regex: search, $options: 'i' } },
         { summary: { $regex: search, $options: 'i' } },
         { content: { $regex: search, $options: 'i' } },
+        { author: { $regex: search, $options: 'i' } },
       ];
     }
 

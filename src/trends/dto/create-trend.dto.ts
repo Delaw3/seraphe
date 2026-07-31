@@ -57,18 +57,13 @@ export class CreateTrendDto {
   @IsString()
   label?: string;
 
-  @ApiPropertyOptional({ example: 'Connecting Mind and Skin Barrier' })
-  @IsOptional()
-  @IsString()
-  subtitle?: string;
-
   @ApiProperty({
     example:
       'Explore how topicals formulated for skin-stress responses are changing beauty.',
   })
   @IsString()
   @MinLength(10)
-  excerpt!: string;
+  summary!: string;
 
   @ApiProperty({ example: 'Full trend analysis content.' })
   @IsString()

@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type BeautyTipDocument = HydratedDocument<BeautyTip>;
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, versionKey: false })
 export class BeautyTip {
   @Prop({ required: true, trim: true })
   title!: string;
@@ -26,6 +26,9 @@ export class BeautyTip {
   @Prop({ required: true, trim: true })
   content!: string;
 
+  @Prop({ trim: true })
+  author?: string;
+
   @Prop({ required: true, min: 1 })
   readTimeMinutes!: number;
 
@@ -47,4 +50,9 @@ export const BeautyTipSchema = SchemaFactory.createForClass(BeautyTip);
 BeautyTipSchema.index({ categorySlug: 1 });
 BeautyTipSchema.index({ isActive: 1 });
 BeautyTipSchema.index({ order: 1 });
-BeautyTipSchema.index({ title: 'text', summary: 'text', content: 'text' });
+BeautyTipSchema.index({
+  title: 'text',
+  summary: 'text',
+  content: 'text',
+  author: 'text',
+});

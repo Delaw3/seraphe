@@ -37,8 +37,7 @@ export class TrendsService {
       focusArea: dto.focusArea.trim(),
       focusAreaSlug: slugify(dto.focusArea),
       label: dto.label?.trim(),
-      subtitle: dto.subtitle?.trim(),
-      excerpt: dto.excerpt.trim(),
+      summary: dto.summary.trim(),
       content: dto.content.trim(),
       author: dto.author?.trim(),
       featureImage: dto.featureImage.trim(),
@@ -136,8 +135,7 @@ export class TrendsService {
       update.focusAreaSlug = slugify(dto.focusArea);
     }
     if (dto.label) update.label = dto.label.trim();
-    if (dto.subtitle) update.subtitle = dto.subtitle.trim();
-    if (dto.excerpt) update.excerpt = dto.excerpt.trim();
+    if (dto.summary) update.summary = dto.summary.trim();
     if (dto.content) update.content = dto.content.trim();
     if (dto.author) update.author = dto.author.trim();
     if (dto.featureImage) update.featureImage = dto.featureImage.trim();
@@ -246,8 +244,7 @@ export class TrendsService {
       const search = query.search.trim();
       filter.$or = [
         { title: { $regex: search, $options: 'i' } },
-        { subtitle: { $regex: search, $options: 'i' } },
-        { excerpt: { $regex: search, $options: 'i' } },
+        { summary: { $regex: search, $options: 'i' } },
         { content: { $regex: search, $options: 'i' } },
         { hashtags: { $regex: search, $options: 'i' } },
       ];

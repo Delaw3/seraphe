@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type SerapheModelDocument = HydratedDocument<SerapheModel>;
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, versionKey: false })
 export class SerapheModel {
   @Prop({ required: true, trim: true })
   name!: string;

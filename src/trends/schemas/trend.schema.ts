@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type TrendDocument = HydratedDocument<Trend>;
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, versionKey: false })
 export class Trend {
   @Prop({ required: true, trim: true })
   title!: string;
@@ -20,11 +20,8 @@ export class Trend {
   @Prop({ trim: true })
   label?: string;
 
-  @Prop({ trim: true })
-  subtitle?: string;
-
   @Prop({ required: true, trim: true })
-  excerpt!: string;
+  summary!: string;
 
   @Prop({ required: true, trim: true })
   content!: string;
@@ -65,7 +62,6 @@ TrendSchema.index({ isFeatured: 1 });
 TrendSchema.index({ order: 1 });
 TrendSchema.index({
   title: 'text',
-  subtitle: 'text',
-  excerpt: 'text',
+  summary: 'text',
   content: 'text',
 });

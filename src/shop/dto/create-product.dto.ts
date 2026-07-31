@@ -94,6 +94,13 @@ export class CreateProductDto {
   @IsString()
   sku?: string;
 
+  @ApiPropertyOptional({
+    example: 'https://seraphebeauty.org/products/hydrating-face-cream',
+  })
+  @IsOptional()
+  @IsUrl()
+  productLink?: string;
+
   @ApiPropertyOptional({ example: ['face', 'cream', 'hydrating'] })
   @IsOptional()
   @IsArray()

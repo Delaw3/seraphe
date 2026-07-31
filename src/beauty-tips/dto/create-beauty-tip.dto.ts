@@ -53,6 +53,11 @@ export class CreateBeautyTipDto {
   @MinLength(20)
   content!: string;
 
+  @ApiPropertyOptional({ example: 'Seraphe Editorial' })
+  @IsOptional()
+  @IsString()
+  author?: string;
+
   @ApiProperty({ example: 4 })
   @Type(() => Number)
   @IsInt()

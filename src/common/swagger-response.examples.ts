@@ -30,6 +30,7 @@ export const productExample = {
   images: ['https://cdn.seraphebeauty.org/products/cream-1.jpg'],
   stock: 25,
   sku: 'SERA-CREAM-001',
+  productLink: 'https://seraphebeauty.org/products/hydrating-face-cream',
   tags: ['face', 'cream', 'hydrating'],
   averageRating: 4.5,
   reviewCount: 12,
@@ -59,6 +60,7 @@ export const beautyTipExample = {
   summary:
     'A targeted guide on using salicylic acid and niacinamide effectively.',
   content: 'Full guide content for the beauty tip.',
+  author: 'Seraphe Editorial',
   readTimeMinutes: 4,
   images: [
     'https://cdn.seraphebeauty.org/tips/acne-1.jpg',
@@ -112,8 +114,7 @@ export const trendExample = {
   focusArea: 'Skincare',
   focusAreaSlug: 'skincare',
   label: 'Trending Now',
-  subtitle: 'Connecting Mind and Skin Barrier',
-  excerpt:
+  summary:
     'Explore how topicals formulated for skin-stress responses are changing beauty.',
   content: 'Full trend analysis content.',
   author: 'Seraphe Editorial',

@@ -4,7 +4,7 @@ import { Category } from './category.schema';
 
 export type ProductDocument = HydratedDocument<Product>;
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, versionKey: false })
 export class Product {
   @Prop({ required: true, trim: true })
   name!: string;
@@ -35,6 +35,9 @@ export class Product {
 
   @Prop({ trim: true })
   sku?: string;
+
+  @Prop({ trim: true })
+  productLink?: string;
 
   @Prop({ type: [String], default: [] })
   tags!: string[];
