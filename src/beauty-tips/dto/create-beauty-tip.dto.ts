@@ -85,6 +85,7 @@ export class CreateBeautyTipDto {
 
     return value;
   })
+  
   @IsArray()
   @ArrayMaxSize(12)
   @IsUrl({}, { each: true })
@@ -106,6 +107,7 @@ export class CreateBeautyTipDto {
 
     return value;
   })
+
   @IsArray()
   @ArrayMaxSize(20)
   @IsString({ each: true })

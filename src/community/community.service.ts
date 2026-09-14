@@ -1,27 +1,32 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, QueryFilter, Types } from 'mongoose';
-import { ApiResponse } from '../shop/interfaces/api-response.interface';
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, QueryFilter, Types } from "mongoose";
+import { MailService } from "../mail/mail.service";
+import { renderNewsletterWelcomeTemplate } from "../mail/templates/newsletter-welcome.template";
+import { ApiResponse } from "../shop/interfaces/api-response.interface";
 import {
   createApiResponse,
   createPaginationMeta,
   omitInternalFields,
   toObjectId,
-} from '../shop/shop.utils';
-import { CreateCommunitySubscriberDto } from './dto/create-community-subscriber.dto';
-import { QueryCommunitySubscribersDto } from './dto/query-community-subscribers.dto';
+} from "../shop/shop.utils";
+import { CreateCommunitySubscriberDto } from "./dto/create-community-subscriber.dto";
+import { QueryCommunitySubscribersDto } from "./dto/query-community-subscribers.dto";
 import {
   CommunitySubscriber,
   CommunitySubscriberDocument,
-} from './schemas/community-subscriber.schema';
+} from "./schemas/community-subscriber.schema";
 
 type PlainCommunitySubscriber = CommunitySubscriber & { _id: Types.ObjectId };
 
 @Injectable()
 export class CommunityService {
+  private readonly logger = new Logger(CommunityService.name);
+
   constructor(
     @InjectModel(CommunitySubscriber.name)
     private readonly subscriberModel: Model<CommunitySubscriberDocument>,
+    private readonly mailService: MailService,
   ) {}
 
   async subscribe(
@@ -47,8 +52,10 @@ export class CommunityService {
       .lean<PlainCommunitySubscriber>()
       .exec();
 
+    await this.sendNewsletterWelcomeEmail(email, dto.name);
+
     return createApiResponse(
-      'Community signup successful.',
+      "Community signup successful.",
       omitInternalFields(subscriber),
     );
   }
@@ -73,7 +80,7 @@ export class CommunityService {
     ]);
 
     return createApiResponse(
-      'Community subscribers retrieved successfully.',
+      "Community subscribers retrieved successfully.",
       subscribers,
       createPaginationMeta(page, limit, total),
     );
@@ -84,18 +91,18 @@ export class CommunityService {
   ): Promise<ApiResponse<PlainCommunitySubscriber>> {
     const subscriber = await this.subscriberModel
       .findOne({
-        _id: toObjectId(id, 'Community subscriber id is invalid.'),
+        _id: toObjectId(id, "Community subscriber id is invalid."),
         isActive: true,
       })
       .lean<PlainCommunitySubscriber>()
       .exec();
 
     if (!subscriber) {
-      throw new NotFoundException('Community subscriber not found.');
+      throw new NotFoundException("Community subscriber not found.");
     }
 
     return createApiResponse(
-      'Community subscriber retrieved successfully.',
+      "Community subscriber retrieved successfully.",
       subscriber,
     );
   }
@@ -106,7 +113,7 @@ export class CommunityService {
     const subscriber = await this.subscriberModel
       .findOneAndUpdate(
         {
-          _id: toObjectId(id, 'Community subscriber id is invalid.'),
+          _id: toObjectId(id, "Community subscriber id is invalid."),
           isActive: true,
         },
         { isActive: false, unsubscribedAt: new Date() },
@@ -116,11 +123,11 @@ export class CommunityService {
       .exec();
 
     if (!subscriber) {
-      throw new NotFoundException('Community subscriber not found.');
+      throw new NotFoundException("Community subscriber not found.");
     }
 
     return createApiResponse(
-      'Community subscriber removed successfully.',
+      "Community subscriber removed successfully.",
       subscriber,
     );
   }
@@ -135,11 +142,40 @@ export class CommunityService {
     if (query.search) {
       const search = query.search.trim();
       filter.$or = [
-        { email: { $regex: search, $options: 'i' } },
-        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: "i" } },
+        { name: { $regex: search, $options: "i" } },
       ];
     }
 
     return filter;
+  }
+
+  private async sendNewsletterWelcomeEmail(
+    email: string,
+    name?: string,
+  ): Promise<void> {
+    try {
+      await this.mailService.sendEmail({
+        to: email,
+        subject: "Welcome to the Seraphe Beauty Newsletter",
+        text:
+          `Hi ${name?.trim() || "there"},\n\n` +
+          "Thank you for joining the Seraphe Beauty community. You are now on the list for beauty tips, product updates, skincare notes, and special announcements.\n\n" +
+          "Visit Seraphe Beauty: https://seraphebeauty.org",
+        html: renderNewsletterWelcomeTemplate({ name }),
+      });
+    } catch (error) {
+      this.logger.error(
+        `Newsletter welcome email failed for ${email}: ${this.getErrorMessage(error)}`,
+      );
+    }
+  }
+
+  private getErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    return "Unknown error";
   }
 }

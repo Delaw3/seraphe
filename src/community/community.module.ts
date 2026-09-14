@@ -1,17 +1,19 @@
-import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { AuthModule } from '../auth/auth.module';
-import { AdminCommunityController } from './admin-community.controller';
-import { CommunityService } from './community.service';
-import { PublicCommunityController } from './public-community.controller';
+import { Module } from "@nestjs/common";
+import { MongooseModule } from "@nestjs/mongoose";
+import { AuthModule } from "../auth/auth.module";
+import { MailModule } from "../mail/mail.module";
+import { AdminCommunityController } from "./admin-community.controller";
+import { CommunityService } from "./community.service";
+import { PublicCommunityController } from "./public-community.controller";
 import {
   CommunitySubscriber,
   CommunitySubscriberSchema,
-} from './schemas/community-subscriber.schema';
+} from "./schemas/community-subscriber.schema";
 
 @Module({
   imports: [
     AuthModule,
+    MailModule,
     MongooseModule.forFeature([
       { name: CommunitySubscriber.name, schema: CommunitySubscriberSchema },
     ]),
