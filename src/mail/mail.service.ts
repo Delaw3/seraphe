@@ -74,33 +74,40 @@ export class MailService {
       host: smtpConfig.host,
       port: smtpConfig.port,
       secure: smtpConfig.secure,
+      requireTLS: !smtpConfig.secure,
       auth: {
         user: smtpConfig.user,
         pass: smtpConfig.password,
       },
     });
 
+    this.logger.log(
+      `SMTP transport configured for ${smtpConfig.host}:${smtpConfig.port} with secure=${smtpConfig.secure}.`,
+    );
+
     return this.transporter;
   }
 
   private getSmtpConfig() {
-    const host = this.configService.get<string>("SMTP_HOST");
-    const portValue = this.configService.get<string>("SMTP_PORT");
+    const host = this.getTrimmedConfigValue("SMTP_HOST");
+    const portValue = this.getTrimmedConfigValue("SMTP_PORT");
     const port = Number(portValue);
-    const secureValue = this.configService.get<string>("SMTP_SECURE");
-    const secure = secureValue === "true";
-    const user = this.configService.get<string>("SMTP_USER");
-    const password = this.configService.get<string>("SMTP_PASSWORD");
+    const secureValue = this.getTrimmedConfigValue("SMTP_SECURE");
+    const secure = this.parseSecureValue(secureValue, port);
+    const user = this.getTrimmedConfigValue("SMTP_USER");
+    const password = this.getTrimmedConfigValue("SMTP_PASSWORD");
 
     if (
       !host ||
       !portValue ||
       Number.isNaN(port) ||
-      !secure ||
+      secure === undefined ||
       !user ||
       !password
     ) {
-      this.logger.error("Email configuration is incomplete or invalid.");
+      this.logger.error(
+        `Email configuration is incomplete or invalid. SMTP_HOST=${this.describeConfigValue(host)}, SMTP_PORT=${this.describeConfigValue(portValue)}, SMTP_SECURE=${this.describeConfigValue(secureValue)}, SMTP_USER=${this.describeConfigValue(user)}, SMTP_PASSWORD=${this.describeConfigValue(password)}.`,
+      );
       throw new ServiceUnavailableException("Email service is not configured.");
     }
 
@@ -111,6 +118,29 @@ export class MailService {
       user,
       password,
     };
+  }
+
+  private getTrimmedConfigValue(key: string): string | undefined {
+    return this.configService.get<string>(key)?.trim();
+  }
+
+  private parseSecureValue(
+    value: string | undefined,
+    port: number,
+  ): boolean | undefined {
+    if (!value) {
+      return Number.isNaN(port) ? undefined : port === 465;
+    }
+
+    const normalizedValue = value.toLowerCase();
+    if (normalizedValue === "true") return true;
+    if (normalizedValue === "false") return false;
+
+    return undefined;
+  }
+
+  private describeConfigValue(value: string | undefined): "set" | "missing" {
+    return value ? "set" : "missing";
   }
 
   private getErrorMessage(error: unknown): string {
