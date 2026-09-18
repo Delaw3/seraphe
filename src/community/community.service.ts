@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, QueryFilter, Types } from "mongoose";
 import { MailService } from "../mail/mail.service";
@@ -33,24 +38,32 @@ export class CommunityService {
     dto: CreateCommunitySubscriberDto,
   ): Promise<ApiResponse<PlainCommunitySubscriber>> {
     const email = dto.email.toLowerCase().trim();
-    const subscriber = await this.subscriberModel
-      .findOneAndUpdate(
-        { email },
-        {
-          $set: {
-            email,
-            name: dto.name?.trim(),
-            isActive: true,
-            unsubscribedAt: null,
+    let subscriber: PlainCommunitySubscriber | null;
+
+    try {
+      subscriber = await this.subscriberModel
+        .findOneAndUpdate(
+          { email, isActive: false },
+          {
+            $set: {
+              email,
+              name: dto.name?.trim(),
+              isActive: true,
+              unsubscribedAt: null,
+              subscribedAt: new Date(),
+            },
           },
-          $setOnInsert: {
-            subscribedAt: new Date(),
-          },
-        },
-        { new: true, upsert: true },
-      )
-      .lean<PlainCommunitySubscriber>()
-      .exec();
+          { new: true, upsert: true },
+        )
+        .lean<PlainCommunitySubscriber>()
+        .exec();
+    } catch (error) {
+      if (this.isDuplicateKeyError(error)) {
+        throw new ConflictException("This email is already subscribed.");
+      }
+
+      throw error;
+    }
 
     await this.sendNewsletterWelcomeEmail(email, dto.name);
 
@@ -177,5 +190,14 @@ export class CommunityService {
     }
 
     return "Unknown error";
+  }
+
+  private isDuplicateKeyError(error: unknown): error is { code: number } {
+    return (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === 11000
+    );
   }
 }
