@@ -6,7 +6,7 @@ import {
   ServiceUnavailableException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import Redis from "ioredis";
+import Redis, { RedisOptions } from "ioredis";
 
 export interface RedisHealthResult {
   status: "ok";
@@ -21,9 +21,22 @@ export class RedisService implements OnModuleInit, OnApplicationShutdown {
   private readonly client?: Redis;
 
   constructor(private readonly configService: ConfigService) {
+    const redisUrl = this.getTrimmedConfigValue("REDIS_URL");
     const host = this.getTrimmedConfigValue("REDIS_HOST");
     const portValue = this.getTrimmedConfigValue("REDIS_PORT");
     const port = Number(portValue);
+    const options: RedisOptions = {
+      lazyConnect: true,
+      maxRetriesPerRequest: 1,
+      enableOfflineQueue: false,
+      retryStrategy: (times) => Math.min(times * 100, 2000),
+    };
+
+    if (redisUrl) {
+      this.client = new Redis(redisUrl, options);
+      this.registerClientEvents("Redis URL");
+      return;
+    }
 
     if (!host || !portValue || Number.isNaN(port)) {
       this.logger.warn("Redis configuration is missing or invalid.");
@@ -33,18 +46,23 @@ export class RedisService implements OnModuleInit, OnApplicationShutdown {
     this.client = new Redis({
       host,
       port,
-      lazyConnect: true,
-      maxRetriesPerRequest: 1,
-      enableOfflineQueue: false,
-      retryStrategy: (times) => Math.min(times * 100, 2000),
+      ...options,
     });
+
+    this.registerClientEvents(`${host}:${port}`);
+  }
+
+  private registerClientEvents(target: string): void {
+    if (!this.client) {
+      return;
+    }
 
     this.client.on("error", (error) => {
       this.logger.error(`Redis connection error: ${error.message}`);
     });
 
     this.client.on("connect", () => {
-      this.logger.log(`Redis connection established for ${host}:${port}.`);
+      this.logger.log(`Redis connection established for ${target}.`);
     });
 
     this.client.on("close", () => {
