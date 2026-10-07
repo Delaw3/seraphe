@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument } from "mongoose";
 
 export type BeautyTipDocument = HydratedDocument<BeautyTip>;
 
@@ -51,8 +51,8 @@ BeautyTipSchema.index({ categorySlug: 1 });
 BeautyTipSchema.index({ isActive: 1 });
 BeautyTipSchema.index({ order: 1 });
 BeautyTipSchema.index({
-  title: 'text',
-  summary: 'text',
-  content: 'text',
-  author: 'text',
+  title: "text",
+  summary: "text",
+  content: "text",
+  author: "text",
 });

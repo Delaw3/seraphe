@@ -1,5 +1,6 @@
-import { Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { SendTestEmailDto } from "./dto/send-test-email.dto";
 import { MailService } from "./mail.service";
 
 @ApiTags("mail")
@@ -9,9 +10,11 @@ export class MailController {
 
   @Post("test")
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ description: "Sends a fixed Gmail SMTP test email." })
-  async sendTestEmail(): Promise<{ message: string; messageId?: string }> {
-    const result = await this.mailService.sendTestEmail();
+  @ApiOkResponse({ description: "Sends a Gmail SMTP test email." })
+  async sendTestEmail(
+    @Body() dto: SendTestEmailDto,
+  ): Promise<{ message: string; messageId?: string }> {
+    const result = await this.mailService.sendTestEmail(dto.email);
 
     return {
       message: "Test email sent successfully.",

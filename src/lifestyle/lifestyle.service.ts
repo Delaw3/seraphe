@@ -3,24 +3,24 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, QueryFilter, Types } from 'mongoose';
-import { ApiResponse } from '../shop/interfaces/api-response.interface';
+} from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, QueryFilter, Types } from "mongoose";
+import { ApiResponse } from "../shop/interfaces/api-response.interface";
 import {
   createApiResponse,
   createPaginationMeta,
   omitInternalFields,
   slugify,
   toObjectId,
-} from '../shop/shop.utils';
-import { CreateLifestyleArticleDto } from './dto/create-lifestyle-article.dto';
-import { QueryLifestyleArticlesDto } from './dto/query-lifestyle-articles.dto';
-import { UpdateLifestyleArticleDto } from './dto/update-lifestyle-article.dto';
+} from "../shop/shop.utils";
+import { CreateLifestyleArticleDto } from "./dto/create-lifestyle-article.dto";
+import { QueryLifestyleArticlesDto } from "./dto/query-lifestyle-articles.dto";
+import { UpdateLifestyleArticleDto } from "./dto/update-lifestyle-article.dto";
 import {
   LifestyleArticle,
   LifestyleArticleDocument,
-} from './schemas/lifestyle-article.schema';
+} from "./schemas/lifestyle-article.schema";
 
 type PlainLifestyleArticle = LifestyleArticle & { _id: Types.ObjectId };
 
@@ -51,7 +51,7 @@ export class LifestyleService {
     });
 
     return createApiResponse(
-      'Lifestyle article created successfully.',
+      "Lifestyle article created successfully.",
       article.toObject(),
     );
   }
@@ -62,7 +62,7 @@ export class LifestyleService {
     return this.paginateArticles(
       this.buildArticleFilter(query, true),
       query,
-      'Lifestyle articles retrieved successfully.',
+      "Lifestyle articles retrieved successfully.",
     );
   }
 
@@ -72,7 +72,7 @@ export class LifestyleService {
     const response = await this.paginateArticles(
       this.buildArticleFilter(query, true),
       query,
-      'Lifestyle articles retrieved successfully.',
+      "Lifestyle articles retrieved successfully.",
     );
 
     return {
@@ -86,18 +86,18 @@ export class LifestyleService {
   ): Promise<ApiResponse<PlainLifestyleArticle>> {
     const article = await this.lifestyleArticleModel
       .findOne({
-        _id: toObjectId(id, 'Lifestyle article id is invalid.'),
+        _id: toObjectId(id, "Lifestyle article id is invalid."),
         isActive: true,
       })
       .lean<PlainLifestyleArticle>()
       .exec();
 
     if (!article) {
-      throw new NotFoundException('Lifestyle article not found.');
+      throw new NotFoundException("Lifestyle article not found.");
     }
 
     return createApiResponse(
-      'Lifestyle article retrieved successfully.',
+      "Lifestyle article retrieved successfully.",
       article,
     );
   }
@@ -111,11 +111,11 @@ export class LifestyleService {
       .exec();
 
     if (!article) {
-      throw new NotFoundException('Lifestyle article not found.');
+      throw new NotFoundException("Lifestyle article not found.");
     }
 
     return createApiResponse(
-      'Lifestyle article retrieved successfully.',
+      "Lifestyle article retrieved successfully.",
       omitInternalFields(article),
     );
   }
@@ -124,14 +124,14 @@ export class LifestyleService {
     id: string,
     dto: UpdateLifestyleArticleDto,
   ): Promise<ApiResponse<PlainLifestyleArticle>> {
-    const articleId = toObjectId(id, 'Lifestyle article id is invalid.');
+    const articleId = toObjectId(id, "Lifestyle article id is invalid.");
     const existing = await this.lifestyleArticleModel
       .findOne({ _id: articleId, isActive: true })
       .lean()
       .exec();
 
     if (!existing) {
-      throw new NotFoundException('Lifestyle article not found.');
+      throw new NotFoundException("Lifestyle article not found.");
     }
 
     const update: Record<string, unknown> = { ...dto };
@@ -168,17 +168,17 @@ export class LifestyleService {
       .exec();
 
     if (!article) {
-      throw new NotFoundException('Lifestyle article not found.');
+      throw new NotFoundException("Lifestyle article not found.");
     }
 
     return createApiResponse(
-      'Lifestyle article updated successfully.',
+      "Lifestyle article updated successfully.",
       article,
     );
   }
 
   async deleteArticle(id: string): Promise<ApiResponse<PlainLifestyleArticle>> {
-    const articleId = toObjectId(id, 'Lifestyle article id is invalid.');
+    const articleId = toObjectId(id, "Lifestyle article id is invalid.");
     const article = await this.lifestyleArticleModel
       .findOneAndUpdate(
         { _id: articleId, isActive: true },
@@ -189,11 +189,11 @@ export class LifestyleService {
       .exec();
 
     if (!article) {
-      throw new NotFoundException('Lifestyle article not found.');
+      throw new NotFoundException("Lifestyle article not found.");
     }
 
     return createApiResponse(
-      'Lifestyle article deleted successfully.',
+      "Lifestyle article deleted successfully.",
       article,
     );
   }
@@ -206,9 +206,9 @@ export class LifestyleService {
         { $match: { isActive: true } },
         {
           $group: {
-            _id: '$categorySlug',
-            name: { $first: '$category' },
-            slug: { $first: '$categorySlug' },
+            _id: "$categorySlug",
+            name: { $first: "$category" },
+            slug: { $first: "$categorySlug" },
           },
         },
         { $sort: { name: 1 } },
@@ -216,8 +216,8 @@ export class LifestyleService {
       ])
       .exec();
 
-    return createApiResponse('Lifestyle categories retrieved successfully.', [
-      { name: 'All Lifestyle', slug: 'all' },
+    return createApiResponse("Lifestyle categories retrieved successfully.", [
+      { name: "All Lifestyle", slug: "all" },
       ...categories,
     ]);
   }
@@ -259,20 +259,20 @@ export class LifestyleService {
       filter.isActive = true;
     }
 
-    if (query.category && query.category !== 'all') {
+    if (query.category && query.category !== "all") {
       filter.categorySlug = slugify(query.category);
     }
 
-    if (typeof query.featured === 'boolean') {
+    if (typeof query.featured === "boolean") {
       filter.isFeatured = query.featured;
     }
 
     if (query.search) {
       const search = query.search.trim();
       filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { excerpt: { $regex: search, $options: 'i' } },
-        { content: { $regex: search, $options: 'i' } },
+        { title: { $regex: search, $options: "i" } },
+        { excerpt: { $regex: search, $options: "i" } },
+        { content: { $regex: search, $options: "i" } },
       ];
     }
 
@@ -283,7 +283,7 @@ export class LifestyleService {
     const baseSlug = slugify(value);
 
     if (!baseSlug) {
-      throw new BadRequestException('Slug could not be generated.');
+      throw new BadRequestException("Slug could not be generated.");
     }
 
     let slug = baseSlug;
@@ -304,16 +304,16 @@ export class LifestyleService {
     const slug = slugify(value);
 
     if (!slug) {
-      throw new BadRequestException('Slug could not be generated.');
+      throw new BadRequestException("Slug could not be generated.");
     }
 
     const exists = await this.lifestyleArticleModel.exists({
       slug,
-      _id: { $ne: toObjectId(excludeId, 'Lifestyle article id is invalid.') },
+      _id: { $ne: toObjectId(excludeId, "Lifestyle article id is invalid.") },
     });
 
     if (exists) {
-      throw new ConflictException('Slug already exists.');
+      throw new ConflictException("Slug already exists.");
     }
 
     return slug;

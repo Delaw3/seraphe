@@ -9,37 +9,37 @@ import {
   Put,
   Query,
   UseGuards,
-} from '@nestjs/common';
+} from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiTags,
-} from '@nestjs/swagger';
-import { AdminJwtGuard } from '../auth/guards/admin-jwt.guard';
+} from "@nestjs/swagger";
+import { AdminJwtGuard } from "../auth/guards/admin-jwt.guard";
 import {
   paginatedResponseExample,
   successResponseExample,
   teamMemberExample,
-} from '../common/swagger-response.examples';
-import { CreateTeamMemberDto } from './dto/create-team-member.dto';
-import { QueryTeamMembersDto } from './dto/query-team-members.dto';
-import { UpdateTeamMemberDto } from './dto/update-team-member.dto';
-import { TeamService } from './team.service';
+} from "../common/swagger-response.examples";
+import { CreateTeamMemberDto } from "./dto/create-team-member.dto";
+import { QueryTeamMembersDto } from "./dto/query-team-members.dto";
+import { UpdateTeamMemberDto } from "./dto/update-team-member.dto";
+import { TeamService } from "./team.service";
 
-@ApiTags('admin team')
+@ApiTags("admin team")
 @ApiBearerAuth()
 @UseGuards(AdminJwtGuard)
-@Controller('api/admin/team')
+@Controller("api/admin/team")
 export class AdminTeamController {
   constructor(private readonly teamService: TeamService) {}
 
   @Post()
   @ApiCreatedResponse({
-    description: 'Create a team member.',
+    description: "Create a team member.",
     schema: {
       example: successResponseExample(
-        'Team member created successfully.',
+        "Team member created successfully.",
         teamMemberExample,
       ),
     },
@@ -50,10 +50,10 @@ export class AdminTeamController {
 
   @Get()
   @ApiOkResponse({
-    description: 'List team members.',
+    description: "List team members.",
     schema: {
       example: paginatedResponseExample(
-        'Team members retrieved successfully.',
+        "Team members retrieved successfully.",
         [teamMemberExample],
       ),
     },
@@ -62,46 +62,46 @@ export class AdminTeamController {
     return this.teamService.findAdminMembers(query);
   }
 
-  @Get(':id')
+  @Get(":id")
   @ApiOkResponse({
-    description: 'Get one team member.',
+    description: "Get one team member.",
     schema: {
       example: successResponseExample(
-        'Team member retrieved successfully.',
+        "Team member retrieved successfully.",
         teamMemberExample,
       ),
     },
   })
-  findMember(@Param('id') id: string) {
+  findMember(@Param("id") id: string) {
     return this.teamService.findAdminMember(id);
   }
 
-  @Patch(':id')
-  @Put(':id')
+  @Patch(":id")
+  @Put(":id")
   @ApiOkResponse({
-    description: 'Update a team member.',
+    description: "Update a team member.",
     schema: {
       example: successResponseExample(
-        'Team member updated successfully.',
+        "Team member updated successfully.",
         teamMemberExample,
       ),
     },
   })
-  updateMember(@Param('id') id: string, @Body() dto: UpdateTeamMemberDto) {
+  updateMember(@Param("id") id: string, @Body() dto: UpdateTeamMemberDto) {
     return this.teamService.updateMember(id, dto);
   }
 
-  @Delete(':id')
+  @Delete(":id")
   @ApiOkResponse({
-    description: 'Soft delete a team member.',
+    description: "Soft delete a team member.",
     schema: {
       example: successResponseExample(
-        'Team member deleted successfully.',
+        "Team member deleted successfully.",
         teamMemberExample,
       ),
     },
   })
-  deleteMember(@Param('id') id: string) {
+  deleteMember(@Param("id") id: string) {
     return this.teamService.deleteMember(id);
   }
 }

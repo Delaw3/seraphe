@@ -1,18 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, QueryFilter, Types } from 'mongoose';
-import { ApiResponse } from '../shop/interfaces/api-response.interface';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, QueryFilter, Types } from "mongoose";
+import { ApiResponse } from "../shop/interfaces/api-response.interface";
 import {
   createApiResponse,
   createPaginationMeta,
   omitInternalFields,
   slugify,
   toObjectId,
-} from '../shop/shop.utils';
-import { CreateTeamMemberDto } from './dto/create-team-member.dto';
-import { QueryTeamMembersDto } from './dto/query-team-members.dto';
-import { UpdateTeamMemberDto } from './dto/update-team-member.dto';
-import { TeamMember, TeamMemberDocument } from './schemas/team-member.schema';
+} from "../shop/shop.utils";
+import { CreateTeamMemberDto } from "./dto/create-team-member.dto";
+import { QueryTeamMembersDto } from "./dto/query-team-members.dto";
+import { UpdateTeamMemberDto } from "./dto/update-team-member.dto";
+import { TeamMember, TeamMemberDocument } from "./schemas/team-member.schema";
 
 type PlainTeamMember = TeamMember & { _id: Types.ObjectId };
 
@@ -48,7 +48,7 @@ export class TeamService {
     });
 
     return createApiResponse(
-      'Team member created successfully.',
+      "Team member created successfully.",
       member.toObject(),
     );
   }
@@ -59,7 +59,7 @@ export class TeamService {
     return this.paginateMembers(
       this.buildMemberFilter(query, true),
       query,
-      'Team members retrieved successfully.',
+      "Team members retrieved successfully.",
     );
   }
 
@@ -69,7 +69,7 @@ export class TeamService {
     const response = await this.paginateMembers(
       this.buildMemberFilter(query, true),
       query,
-      'Team members retrieved successfully.',
+      "Team members retrieved successfully.",
     );
 
     return {
@@ -86,8 +86,8 @@ export class TeamService {
       .exec();
 
     const sections = members.reduce<TeamSection[]>((groups, member) => {
-      const sectionName = member.section ?? 'Team';
-      const sectionSlug = member.sectionSlug ?? 'team';
+      const sectionName = member.section ?? "Team";
+      const sectionSlug = member.sectionSlug ?? "team";
       const existing = groups.find((group) => group.slug === sectionSlug);
 
       if (existing) {
@@ -104,37 +104,37 @@ export class TeamService {
       return groups;
     }, []);
 
-    return createApiResponse('Team sections retrieved successfully.', sections);
+    return createApiResponse("Team sections retrieved successfully.", sections);
   }
 
   async findAdminMember(id: string): Promise<ApiResponse<PlainTeamMember>> {
     const member = await this.teamMemberModel
       .findOne({
-        _id: toObjectId(id, 'Team member id is invalid.'),
+        _id: toObjectId(id, "Team member id is invalid."),
         isActive: true,
       })
       .lean<PlainTeamMember>()
       .exec();
 
     if (!member) {
-      throw new NotFoundException('Team member not found.');
+      throw new NotFoundException("Team member not found.");
     }
 
-    return createApiResponse('Team member retrieved successfully.', member);
+    return createApiResponse("Team member retrieved successfully.", member);
   }
 
   async updateMember(
     id: string,
     dto: UpdateTeamMemberDto,
   ): Promise<ApiResponse<PlainTeamMember>> {
-    const memberId = toObjectId(id, 'Team member id is invalid.');
+    const memberId = toObjectId(id, "Team member id is invalid.");
     const existing = await this.teamMemberModel
       .findOne({ _id: memberId, isActive: true })
       .lean()
       .exec();
 
     if (!existing) {
-      throw new NotFoundException('Team member not found.');
+      throw new NotFoundException("Team member not found.");
     }
 
     const update: Record<string, unknown> = { ...dto };
@@ -157,16 +157,16 @@ export class TeamService {
       .exec();
 
     if (!member) {
-      throw new NotFoundException('Team member not found.');
+      throw new NotFoundException("Team member not found.");
     }
 
-    return createApiResponse('Team member updated successfully.', member);
+    return createApiResponse("Team member updated successfully.", member);
   }
 
   async deleteMember(id: string): Promise<ApiResponse<PlainTeamMember>> {
     const member = await this.teamMemberModel
       .findOneAndUpdate(
-        { _id: toObjectId(id, 'Team member id is invalid.'), isActive: true },
+        { _id: toObjectId(id, "Team member id is invalid."), isActive: true },
         { isActive: false },
         { new: true },
       )
@@ -174,10 +174,10 @@ export class TeamService {
       .exec();
 
     if (!member) {
-      throw new NotFoundException('Team member not found.');
+      throw new NotFoundException("Team member not found.");
     }
 
-    return createApiResponse('Team member deleted successfully.', member);
+    return createApiResponse("Team member deleted successfully.", member);
   }
 
   async findPublicSections(): Promise<
@@ -188,9 +188,9 @@ export class TeamService {
         { $match: { isActive: true, sectionSlug: { $exists: true } } },
         {
           $group: {
-            _id: '$sectionSlug',
-            name: { $first: '$section' },
-            slug: { $first: '$sectionSlug' },
+            _id: "$sectionSlug",
+            name: { $first: "$section" },
+            slug: { $first: "$sectionSlug" },
           },
         },
         { $sort: { name: 1 } },
@@ -198,7 +198,7 @@ export class TeamService {
       ])
       .exec();
 
-    return createApiResponse('Team sections retrieved successfully.', sections);
+    return createApiResponse("Team sections retrieved successfully.", sections);
   }
 
   private async paginateMembers(
@@ -238,17 +238,17 @@ export class TeamService {
       filter.isActive = true;
     }
 
-    if (query.section && query.section !== 'all') {
+    if (query.section && query.section !== "all") {
       filter.sectionSlug = slugify(query.section);
     }
 
     if (query.search) {
       const search = query.search.trim();
       filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { role: { $regex: search, $options: 'i' } },
-        { section: { $regex: search, $options: 'i' } },
-        { bio: { $regex: search, $options: 'i' } },
+        { name: { $regex: search, $options: "i" } },
+        { role: { $regex: search, $options: "i" } },
+        { section: { $regex: search, $options: "i" } },
+        { bio: { $regex: search, $options: "i" } },
       ];
     }
 

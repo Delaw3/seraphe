@@ -2,8 +2,8 @@ import {
   ApiHideProperty,
   ApiProperty,
   ApiPropertyOptional,
-} from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+} from "@nestjs/swagger";
+import { Transform, Type } from "class-transformer";
 import {
   ArrayMaxSize,
   IsArray,
@@ -14,42 +14,42 @@ import {
   IsUrl,
   Min,
   MinLength,
-} from 'class-validator';
+} from "class-validator";
 
 export class CreateLifestyleArticleDto {
-  @ApiProperty({ example: 'Top 3 Regina Daniels Beauty Secrets' })
+  @ApiProperty({ example: "Top 3 Regina Daniels Beauty Secrets" })
   @IsString()
   @MinLength(3)
   title!: string;
 
   @ApiHideProperty()
   @Transform(({ value }) =>
-    typeof value === 'string' && !value.trim() ? undefined : value,
+    typeof value === "string" && !value.trim() ? undefined : value,
   )
   @IsOptional()
   @IsString()
   @MinLength(3)
   slug?: string;
 
-  @ApiProperty({ example: 'Make-Up' })
+  @ApiProperty({ example: "Make-Up" })
   @IsString()
   @MinLength(2)
   category!: string;
 
   @ApiProperty({
     example:
-      'Find helpful application techniques and product routines for glowing skin.',
+      "Find helpful application techniques and product routines for glowing skin.",
   })
   @IsString()
   @MinLength(10)
   excerpt!: string;
 
-  @ApiProperty({ example: 'Full lifestyle article content.' })
+  @ApiProperty({ example: "Full lifestyle article content." })
   @IsString()
   @MinLength(20)
   content!: string;
 
-  @ApiProperty({ example: 'Ogunmola Gbemisola' })
+  @ApiProperty({ example: "Ogunmola Gbemisola" })
   @IsString()
   @MinLength(2)
   author!: string;
@@ -61,20 +61,20 @@ export class CreateLifestyleArticleDto {
   readTimeMinutes!: number;
 
   @ApiPropertyOptional({
-    example: 'https://cdn.seraphebeauty.org/lifestyle/glowing-skin.jpg',
+    example: "https://cdn.seraphebeauty.org/lifestyle/glowing-skin.jpg",
   })
   @IsOptional()
   @IsUrl()
   image?: string;
 
-  @ApiPropertyOptional({ example: ['skin', 'makeup'] })
+  @ApiPropertyOptional({ example: ["skin", "makeup"] })
   @IsOptional()
   @Transform(({ value }) => {
     if (Array.isArray(value)) {
       return value.map((item) => String(item).trim()).filter(Boolean);
     }
 
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       return value
         .split(/[\n,]+/)
         .map((item) => item.trim())

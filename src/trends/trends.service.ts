@@ -3,21 +3,21 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, QueryFilter, Types } from 'mongoose';
-import { ApiResponse } from '../shop/interfaces/api-response.interface';
+} from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, QueryFilter, Types } from "mongoose";
+import { ApiResponse } from "../shop/interfaces/api-response.interface";
 import {
   createApiResponse,
   createPaginationMeta,
   omitInternalFields,
   slugify,
   toObjectId,
-} from '../shop/shop.utils';
-import { CreateTrendDto } from './dto/create-trend.dto';
-import { QueryTrendsDto } from './dto/query-trends.dto';
-import { UpdateTrendDto } from './dto/update-trend.dto';
-import { Trend, TrendDocument } from './schemas/trend.schema';
+} from "../shop/shop.utils";
+import { CreateTrendDto } from "./dto/create-trend.dto";
+import { QueryTrendsDto } from "./dto/query-trends.dto";
+import { UpdateTrendDto } from "./dto/update-trend.dto";
+import { Trend, TrendDocument } from "./schemas/trend.schema";
 
 type PlainTrend = Trend & { _id: Types.ObjectId };
 
@@ -49,7 +49,7 @@ export class TrendsService {
       order: dto.order ?? 0,
     });
 
-    return createApiResponse('Trend created successfully.', trend.toObject());
+    return createApiResponse("Trend created successfully.", trend.toObject());
   }
 
   async findAdminTrends(
@@ -58,7 +58,7 @@ export class TrendsService {
     return this.paginateTrends(
       this.buildTrendFilter(query, true),
       query,
-      'Trends retrieved successfully.',
+      "Trends retrieved successfully.",
     );
   }
 
@@ -68,7 +68,7 @@ export class TrendsService {
     const response = await this.paginateTrends(
       this.buildTrendFilter(query, true),
       query,
-      'Trends retrieved successfully.',
+      "Trends retrieved successfully.",
     );
 
     return {
@@ -80,17 +80,17 @@ export class TrendsService {
   async findAdminTrend(id: string): Promise<ApiResponse<PlainTrend>> {
     const trend = await this.trendModel
       .findOne({
-        _id: toObjectId(id, 'Trend id is invalid.'),
+        _id: toObjectId(id, "Trend id is invalid."),
         isActive: true,
       })
       .lean<PlainTrend>()
       .exec();
 
     if (!trend) {
-      throw new NotFoundException('Trend not found.');
+      throw new NotFoundException("Trend not found.");
     }
 
-    return createApiResponse('Trend retrieved successfully.', trend);
+    return createApiResponse("Trend retrieved successfully.", trend);
   }
 
   async findPublicTrendBySlug(slug: string): Promise<ApiResponse<PlainTrend>> {
@@ -100,11 +100,11 @@ export class TrendsService {
       .exec();
 
     if (!trend) {
-      throw new NotFoundException('Trend not found.');
+      throw new NotFoundException("Trend not found.");
     }
 
     return createApiResponse(
-      'Trend retrieved successfully.',
+      "Trend retrieved successfully.",
       omitInternalFields(trend),
     );
   }
@@ -113,14 +113,14 @@ export class TrendsService {
     id: string,
     dto: UpdateTrendDto,
   ): Promise<ApiResponse<PlainTrend>> {
-    const trendId = toObjectId(id, 'Trend id is invalid.');
+    const trendId = toObjectId(id, "Trend id is invalid.");
     const existing = await this.trendModel
       .findOne({ _id: trendId, isActive: true })
       .lean()
       .exec();
 
     if (!existing) {
-      throw new NotFoundException('Trend not found.');
+      throw new NotFoundException("Trend not found.");
     }
 
     const update: Record<string, unknown> = { ...dto };
@@ -147,14 +147,14 @@ export class TrendsService {
       .exec();
 
     if (!trend) {
-      throw new NotFoundException('Trend not found.');
+      throw new NotFoundException("Trend not found.");
     }
 
-    return createApiResponse('Trend updated successfully.', trend);
+    return createApiResponse("Trend updated successfully.", trend);
   }
 
   async deleteTrend(id: string): Promise<ApiResponse<PlainTrend>> {
-    const trendId = toObjectId(id, 'Trend id is invalid.');
+    const trendId = toObjectId(id, "Trend id is invalid.");
     const trend = await this.trendModel
       .findOneAndUpdate(
         { _id: trendId, isActive: true },
@@ -165,10 +165,10 @@ export class TrendsService {
       .exec();
 
     if (!trend) {
-      throw new NotFoundException('Trend not found.');
+      throw new NotFoundException("Trend not found.");
     }
 
-    return createApiResponse('Trend deleted successfully.', trend);
+    return createApiResponse("Trend deleted successfully.", trend);
   }
 
   async findPublicFocusAreas(): Promise<
@@ -179,9 +179,9 @@ export class TrendsService {
         { $match: { isActive: true } },
         {
           $group: {
-            _id: '$focusAreaSlug',
-            name: { $first: '$focusArea' },
-            slug: { $first: '$focusAreaSlug' },
+            _id: "$focusAreaSlug",
+            name: { $first: "$focusArea" },
+            slug: { $first: "$focusAreaSlug" },
           },
         },
         { $sort: { name: 1 } },
@@ -189,8 +189,8 @@ export class TrendsService {
       ])
       .exec();
 
-    return createApiResponse('Trend focus areas retrieved successfully.', [
-      { name: 'All', slug: 'all' },
+    return createApiResponse("Trend focus areas retrieved successfully.", [
+      { name: "All", slug: "all" },
       ...focusAreas,
     ]);
   }
@@ -232,21 +232,21 @@ export class TrendsService {
       filter.isActive = true;
     }
 
-    if (query.focusArea && query.focusArea !== 'all') {
+    if (query.focusArea && query.focusArea !== "all") {
       filter.focusAreaSlug = slugify(query.focusArea);
     }
 
-    if (typeof query.featured === 'boolean') {
+    if (typeof query.featured === "boolean") {
       filter.isFeatured = query.featured;
     }
 
     if (query.search) {
       const search = query.search.trim();
       filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { summary: { $regex: search, $options: 'i' } },
-        { content: { $regex: search, $options: 'i' } },
-        { hashtags: { $regex: search, $options: 'i' } },
+        { title: { $regex: search, $options: "i" } },
+        { summary: { $regex: search, $options: "i" } },
+        { content: { $regex: search, $options: "i" } },
+        { hashtags: { $regex: search, $options: "i" } },
       ];
     }
 
@@ -257,7 +257,7 @@ export class TrendsService {
     const baseSlug = slugify(value);
 
     if (!baseSlug) {
-      throw new BadRequestException('Slug could not be generated.');
+      throw new BadRequestException("Slug could not be generated.");
     }
 
     let slug = baseSlug;
@@ -278,16 +278,16 @@ export class TrendsService {
     const slug = slugify(value);
 
     if (!slug) {
-      throw new BadRequestException('Slug could not be generated.');
+      throw new BadRequestException("Slug could not be generated.");
     }
 
     const exists = await this.trendModel.exists({
       slug,
-      _id: { $ne: toObjectId(excludeId, 'Trend id is invalid.') },
+      _id: { $ne: toObjectId(excludeId, "Trend id is invalid.") },
     });
 
     if (exists) {
-      throw new ConflictException('Slug already exists.');
+      throw new ConflictException("Slug already exists.");
     }
 
     return slug;

@@ -1,6 +1,6 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsOptional, IsString, Max, Min } from 'class-validator';
+import { ApiPropertyOptional } from "@nestjs/swagger";
+import { Type } from "class-transformer";
+import { IsOptional, IsString, Max, Min } from "class-validator";
 
 export class QuerySerapheModelsDto {
   @ApiPropertyOptional({ default: 1 })
@@ -16,7 +16,7 @@ export class QuerySerapheModelsDto {
   @Max(100)
   limit?: number = 12;
 
-  @ApiPropertyOptional({ example: 'amina' })
+  @ApiPropertyOptional({ example: "amina" })
   @IsOptional()
   @IsString()
   search?: string;

@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument } from "mongoose";
 
 export type TeamMemberDocument = HydratedDocument<TeamMember>;
 
@@ -44,4 +44,4 @@ export const TeamMemberSchema = SchemaFactory.createForClass(TeamMember);
 TeamMemberSchema.index({ sectionSlug: 1 });
 TeamMemberSchema.index({ isActive: 1 });
 TeamMemberSchema.index({ order: 1 });
-TeamMemberSchema.index({ name: 'text', role: 'text', bio: 'text' });
+TeamMemberSchema.index({ name: "text", role: "text", bio: "text" });

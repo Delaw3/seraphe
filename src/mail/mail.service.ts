@@ -55,9 +55,9 @@ export class MailService {
     }
   }
 
-  async sendTestEmail(): Promise<SMTPTransport.SentMessageInfo> {
+  async sendTestEmail(to: string): Promise<SMTPTransport.SentMessageInfo> {
     return this.sendEmail({
-      to: "lauphix1@gmail.com",
+      to: to.toLowerCase().trim(),
       subject: "Seraphe Beauty Email Test",
       text: "Seraphe Beauty\n\nGmail SMTP has been configured successfully.",
       html: renderTestEmailTemplate(),

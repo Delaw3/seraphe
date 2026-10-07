@@ -1,9 +1,9 @@
-import { BadRequestException } from '@nestjs/common';
-import { Types } from 'mongoose';
+import { BadRequestException } from "@nestjs/common";
+import { Types } from "mongoose";
 import {
   ApiResponse,
   PaginationMeta,
-} from './interfaces/api-response.interface';
+} from "./interfaces/api-response.interface";
 
 export function createApiResponse<T>(
   message: string,
@@ -38,7 +38,7 @@ function omitFields<T>(value: T, hiddenKeys: string[]): T {
 
   if (
     !value ||
-    typeof value !== 'object' ||
+    typeof value !== "object" ||
     value instanceof Date ||
     value instanceof Types.ObjectId
   ) {
@@ -58,31 +58,31 @@ function omitFields<T>(value: T, hiddenKeys: string[]): T {
 }
 
 export function omitVersionFields<T>(value: T): T {
-  return omitFields(value, ['__v', '_v']);
+  return omitFields(value, ["__v", "_v"]);
 }
 
 export function omitInternalFields<T>(value: T): T {
-  return omitFields(value, ['isActive', '__v', '_v']);
+  return omitFields(value, ["isActive", "__v", "_v"]);
 }
 
 export function escapeRegex(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 export function slugify(value: string): string {
   return value
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 export function toBoolean(value?: string): boolean | undefined {
-  if (value === 'true') {
+  if (value === "true") {
     return true;
   }
 
-  if (value === 'false') {
+  if (value === "false") {
     return false;
   }
 

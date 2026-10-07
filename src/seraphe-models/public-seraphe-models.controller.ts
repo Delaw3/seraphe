@@ -1,25 +1,25 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, Query } from "@nestjs/common";
+import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import {
   paginatedResponseExample,
   serapheModelCategoriesResponseExample,
   serapheModelExample,
   successResponseExample,
-} from '../common/swagger-response.examples';
-import { QuerySerapheModelsDto } from './dto/query-seraphe-models.dto';
-import { SerapheModelsService } from './seraphe-models.service';
+} from "../common/swagger-response.examples";
+import { QuerySerapheModelsDto } from "./dto/query-seraphe-models.dto";
+import { SerapheModelsService } from "./seraphe-models.service";
 
-@ApiTags('seraphé models')
-@Controller('api/seraphe-models')
+@ApiTags("seraphé models")
+@Controller("api/seraphe-models")
 export class PublicSerapheModelsController {
   constructor(private readonly serapheModelsService: SerapheModelsService) {}
 
   @Get()
   @ApiOkResponse({
-    description: 'List active Seraphé model profiles.',
+    description: "List active Seraphé model profiles.",
     schema: {
       example: paginatedResponseExample(
-        'Seraphé models retrieved successfully.',
+        "Seraphé models retrieved successfully.",
         [serapheModelExample],
       ),
     },
@@ -28,26 +28,26 @@ export class PublicSerapheModelsController {
     return this.serapheModelsService.findPublicModels(query);
   }
 
-  @Get('categories')
+  @Get("categories")
   @ApiOkResponse({
-    description: 'List Seraphé model categories.',
+    description: "List Seraphé model categories.",
     schema: { example: serapheModelCategoriesResponseExample },
   })
   findCategories() {
     return this.serapheModelsService.findPublicCategories();
   }
 
-  @Get(':id')
+  @Get(":id")
   @ApiOkResponse({
-    description: 'Get one active Seraphé model profile.',
+    description: "Get one active Seraphé model profile.",
     schema: {
       example: successResponseExample(
-        'Seraphé model retrieved successfully.',
+        "Seraphé model retrieved successfully.",
         serapheModelExample,
       ),
     },
   })
-  findModel(@Param('id') id: string) {
+  findModel(@Param("id") id: string) {
     return this.serapheModelsService.findPublicModelById(id);
   }
 }

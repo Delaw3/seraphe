@@ -2,8 +2,8 @@ import {
   ApiHideProperty,
   ApiProperty,
   ApiPropertyOptional,
-} from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+} from "@nestjs/swagger";
+import { Transform, Type } from "class-transformer";
 import {
   ArrayMaxSize,
   IsArray,
@@ -13,47 +13,47 @@ import {
   IsUrl,
   Min,
   MinLength,
-} from 'class-validator';
+} from "class-validator";
 
 export class CreateBeautyTipDto {
-  @ApiProperty({ example: 'Managing Hormonal Acne Breakouts' })
+  @ApiProperty({ example: "Managing Hormonal Acne Breakouts" })
   @IsString()
   @MinLength(3)
   title!: string;
 
   @ApiHideProperty()
   @Transform(({ value }) =>
-    typeof value === 'string' && !value.trim() ? undefined : value,
+    typeof value === "string" && !value.trim() ? undefined : value,
   )
   @IsOptional()
   @IsString()
   @MinLength(3)
   slug?: string;
 
-  @ApiProperty({ example: 'Acne' })
+  @ApiProperty({ example: "Acne" })
   @IsString()
   @MinLength(2)
   category!: string;
 
-  @ApiProperty({ example: 'Beginner' })
+  @ApiProperty({ example: "Beginner" })
   @IsString()
   @MinLength(2)
   level!: string;
 
   @ApiProperty({
     example:
-      'A targeted guide on using salicylic acid and niacinamide effectively.',
+      "A targeted guide on using salicylic acid and niacinamide effectively.",
   })
   @IsString()
   @MinLength(10)
   summary!: string;
 
-  @ApiProperty({ example: 'Full guide content for the beauty tip.' })
+  @ApiProperty({ example: "Full guide content for the beauty tip." })
   @IsString()
   @MinLength(20)
   content!: string;
 
-  @ApiPropertyOptional({ example: 'Seraphe Editorial' })
+  @ApiPropertyOptional({ example: "Seraphe Editorial" })
   @IsOptional()
   @IsString()
   author?: string;
@@ -66,8 +66,8 @@ export class CreateBeautyTipDto {
 
   @ApiPropertyOptional({
     example: [
-      'https://example.com/tips/acne-1.jpg',
-      'https://example.com/tips/acne-2.jpg',
+      "https://example.com/tips/acne-1.jpg",
+      "https://example.com/tips/acne-2.jpg",
     ],
   })
   @IsOptional()
@@ -76,7 +76,7 @@ export class CreateBeautyTipDto {
       return value.map((item) => String(item).trim()).filter(Boolean);
     }
 
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       return value
         .split(/[\n,]+/)
         .map((item) => item.trim())
@@ -85,20 +85,19 @@ export class CreateBeautyTipDto {
 
     return value;
   })
-  
   @IsArray()
   @ArrayMaxSize(12)
   @IsUrl({}, { each: true })
   images?: string[];
 
-  @ApiPropertyOptional({ example: ['acne', 'salicylic acid'] })
+  @ApiPropertyOptional({ example: ["acne", "salicylic acid"] })
   @IsOptional()
   @Transform(({ value }) => {
     if (Array.isArray(value)) {
       return value.map((item) => String(item).trim()).filter(Boolean);
     }
 
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       return value
         .split(/[\n,]+/)
         .map((item) => item.trim())
@@ -107,7 +106,6 @@ export class CreateBeautyTipDto {
 
     return value;
   })
-
   @IsArray()
   @ArrayMaxSize(20)
   @IsString({ each: true })

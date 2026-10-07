@@ -3,23 +3,23 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, QueryFilter, Types } from 'mongoose';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { CreateProductDto } from './dto/create-product.dto';
-import { CreateReviewDto } from './dto/create-review.dto';
+} from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, QueryFilter, Types } from "mongoose";
+import { CreateCategoryDto } from "./dto/create-category.dto";
+import { CreateProductDto } from "./dto/create-product.dto";
+import { CreateReviewDto } from "./dto/create-review.dto";
 import {
   AdminQueryProductsDto,
   QueryProductsDto,
-} from './dto/query-products.dto';
-import { AdminQueryReviewsDto, QueryReviewsDto } from './dto/query-reviews.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiResponse } from './interfaces/api-response.interface';
-import { Category, CategoryDocument } from './schemas/category.schema';
-import { Product, ProductDocument } from './schemas/product.schema';
-import { Review, ReviewDocument } from './schemas/review.schema';
+} from "./dto/query-products.dto";
+import { AdminQueryReviewsDto, QueryReviewsDto } from "./dto/query-reviews.dto";
+import { UpdateCategoryDto } from "./dto/update-category.dto";
+import { UpdateProductDto } from "./dto/update-product.dto";
+import { ApiResponse } from "./interfaces/api-response.interface";
+import { Category, CategoryDocument } from "./schemas/category.schema";
+import { Product, ProductDocument } from "./schemas/product.schema";
+import { Review, ReviewDocument } from "./schemas/review.schema";
 import {
   createApiResponse,
   createPaginationMeta,
@@ -28,7 +28,7 @@ import {
   slugify,
   toBoolean,
   toObjectId,
-} from './shop.utils';
+} from "./shop.utils";
 
 type PlainCategory = Category & { _id: Types.ObjectId };
 type PlainProduct = Product & {
@@ -69,7 +69,7 @@ export class ShopService {
     });
 
     return createApiResponse(
-      'Category created successfully.',
+      "Category created successfully.",
       category.toObject(),
     );
   }
@@ -81,7 +81,7 @@ export class ShopService {
       .lean<PlainCategory[]>()
       .exec();
 
-    return createApiResponse('Categories retrieved successfully.', categories);
+    return createApiResponse("Categories retrieved successfully.", categories);
   }
 
   async findPublicCategories(): Promise<ApiResponse<PlainCategory[]>> {
@@ -92,14 +92,14 @@ export class ShopService {
       .exec();
 
     return createApiResponse(
-      'Categories retrieved successfully.',
+      "Categories retrieved successfully.",
       omitInternalFields(categories),
     );
   }
 
   async findAdminCategory(id: string): Promise<ApiResponse<PlainCategory>> {
     const category = await this.findCategoryById(id, true);
-    return createApiResponse('Category retrieved successfully.', category);
+    return createApiResponse("Category retrieved successfully.", category);
   }
 
   async updateCategory(
@@ -130,14 +130,14 @@ export class ShopService {
       .exec();
 
     if (!category) {
-      throw new NotFoundException('Category not found.');
+      throw new NotFoundException("Category not found.");
     }
 
-    return createApiResponse('Category updated successfully.', category);
+    return createApiResponse("Category updated successfully.", category);
   }
 
   async deleteCategory(id: string): Promise<ApiResponse<PlainCategory>> {
-    const categoryId = toObjectId(id, 'Category id is invalid.');
+    const categoryId = toObjectId(id, "Category id is invalid.");
     const category = await this.categoryModel
       .findOneAndUpdate(
         { _id: categoryId, isActive: true },
@@ -148,10 +148,10 @@ export class ShopService {
       .exec();
 
     if (!category) {
-      throw new NotFoundException('Category not found.');
+      throw new NotFoundException("Category not found.");
     }
 
-    return createApiResponse('Category deleted successfully.', category);
+    return createApiResponse("Category deleted successfully.", category);
   }
 
   async createProduct(
@@ -178,7 +178,7 @@ export class ShopService {
     });
 
     return createApiResponse(
-      'Product created successfully.',
+      "Product created successfully.",
       product.toObject(),
     );
   }
@@ -190,38 +190,38 @@ export class ShopService {
     return this.paginateProducts(
       filter,
       query,
-      'Products retrieved successfully.',
+      "Products retrieved successfully.",
       true,
     );
   }
 
   async findAdminProduct(id: string): Promise<ApiResponse<PlainProduct>> {
-    const productId = toObjectId(id, 'Product id is invalid.');
+    const productId = toObjectId(id, "Product id is invalid.");
     const product = await this.productModel
       .findOne({ _id: productId, isActive: true })
-      .populate('category')
+      .populate("category")
       .lean<PlainProduct>()
       .exec();
 
     if (!product) {
-      throw new NotFoundException('Product not found.');
+      throw new NotFoundException("Product not found.");
     }
 
-    return createApiResponse('Product retrieved successfully.', product);
+    return createApiResponse("Product retrieved successfully.", product);
   }
 
   async updateProduct(
     id: string,
     dto: UpdateProductDto,
   ): Promise<ApiResponse<PlainProduct>> {
-    const productId = toObjectId(id, 'Product id is invalid.');
+    const productId = toObjectId(id, "Product id is invalid.");
     const existing = await this.productModel
       .findOne({ _id: productId, isActive: true })
       .lean()
       .exec();
 
     if (!existing) {
-      throw new NotFoundException('Product not found.');
+      throw new NotFoundException("Product not found.");
     }
 
     const update: Record<string, unknown> = { ...dto };
@@ -246,34 +246,34 @@ export class ShopService {
 
     const product = await this.productModel
       .findByIdAndUpdate(productId, update, { new: true })
-      .populate('category')
+      .populate("category")
       .lean<PlainProduct>()
       .exec();
 
     if (!product) {
-      throw new NotFoundException('Product not found.');
+      throw new NotFoundException("Product not found.");
     }
 
-    return createApiResponse('Product updated successfully.', product);
+    return createApiResponse("Product updated successfully.", product);
   }
 
   async deleteProduct(id: string): Promise<ApiResponse<PlainProduct>> {
-    const productId = toObjectId(id, 'Product id is invalid.');
+    const productId = toObjectId(id, "Product id is invalid.");
     const product = await this.productModel
       .findOneAndUpdate(
         { _id: productId, isActive: true },
         { isActive: false },
         { new: true },
       )
-      .populate('category')
+      .populate("category")
       .lean<PlainProduct>()
       .exec();
 
     if (!product) {
-      throw new NotFoundException('Product not found.');
+      throw new NotFoundException("Product not found.");
     }
 
-    return createApiResponse('Product deleted successfully.', product);
+    return createApiResponse("Product deleted successfully.", product);
   }
 
   async getShopHome(): Promise<
@@ -292,13 +292,13 @@ export class ShopService {
         .find({ isActive: true, isFeatured: true })
         .sort({ createdAt: -1 })
         .limit(8)
-        .populate('category')
+        .populate("category")
         .lean<PlainProduct[]>()
         .exec(),
     ]);
 
     return createApiResponse(
-      'Shop retrieved successfully.',
+      "Shop retrieved successfully.",
       omitInternalFields({
         categories,
         featuredProducts,
@@ -314,7 +314,7 @@ export class ShopService {
     const response = await this.paginateProducts(
       filter,
       query,
-      'Products retrieved successfully.',
+      "Products retrieved successfully.",
       true,
     );
 
@@ -329,16 +329,16 @@ export class ShopService {
   ): Promise<ApiResponse<PlainProduct>> {
     const product = await this.productModel
       .findOne({ slug, isActive: true })
-      .populate('category')
+      .populate("category")
       .lean<PlainProduct>()
       .exec();
 
     if (!product) {
-      throw new NotFoundException('Product not found.');
+      throw new NotFoundException("Product not found.");
     }
 
     return createApiResponse(
-      'Product retrieved successfully.',
+      "Product retrieved successfully.",
       omitInternalFields(product),
     );
   }
@@ -349,12 +349,12 @@ export class ShopService {
   ): Promise<ApiResponse<PlainReview>> {
     const product = await this.productModel
       .findOne({ slug, isActive: true })
-      .select('_id')
+      .select("_id")
       .lean<{ _id: Types.ObjectId }>()
       .exec();
 
     if (!product) {
-      throw new NotFoundException('Product not found.');
+      throw new NotFoundException("Product not found.");
     }
 
     const review = await this.reviewModel.create({
@@ -368,7 +368,7 @@ export class ShopService {
     await this.refreshProductRatingStats(product._id);
 
     return createApiResponse(
-      'Review submitted successfully.',
+      "Review submitted successfully.",
       review.toObject(),
     );
   }
@@ -379,18 +379,18 @@ export class ShopService {
   ): Promise<ApiResponse<PlainReview[]>> {
     const product = await this.productModel
       .findOne({ slug, isActive: true })
-      .select('_id')
+      .select("_id")
       .lean<{ _id: Types.ObjectId }>()
       .exec();
 
     if (!product) {
-      throw new NotFoundException('Product not found.');
+      throw new NotFoundException("Product not found.");
     }
 
     return this.paginateReviews(
       { product: product._id },
       query,
-      'Reviews retrieved successfully.',
+      "Reviews retrieved successfully.",
       false,
     );
   }
@@ -401,13 +401,13 @@ export class ShopService {
     const filter: QueryFilter<ReviewDocument> = {};
 
     if (query.product) {
-      filter.product = toObjectId(query.product, 'Product id is invalid.');
+      filter.product = toObjectId(query.product, "Product id is invalid.");
     }
 
     return this.paginateReviews(
       filter,
       query,
-      'Reviews retrieved successfully.',
+      "Reviews retrieved successfully.",
       true,
     );
   }
@@ -429,7 +429,7 @@ export class ShopService {
       .limit(limit);
 
     if (populateCategory) {
-      productQuery.populate('category');
+      productQuery.populate("category");
     }
 
     const [products, total] = await Promise.all([
@@ -461,7 +461,7 @@ export class ShopService {
       .limit(limit);
 
     if (populateProduct) {
-      reviewQuery.populate('product');
+      reviewQuery.populate("product");
     }
 
     const [reviews, total] = await Promise.all([
@@ -482,7 +482,7 @@ export class ShopService {
     const filter: QueryFilter<ProductDocument> = { isActive: true };
 
     if (query.category) {
-      filter.category = toObjectId(query.category, 'Category id is invalid.');
+      filter.category = toObjectId(query.category, "Category id is invalid.");
     }
 
     return this.applyProductSearchAndFeaturedFilter(filter, query);
@@ -496,7 +496,7 @@ export class ShopService {
     if (query.category) {
       const category = await this.categoryModel
         .findOne({ slug: query.category, isActive: true })
-        .select('_id')
+        .select("_id")
         .lean<{ _id: Types.ObjectId }>()
         .exec();
 
@@ -521,7 +521,7 @@ export class ShopService {
     }
 
     if (query.search) {
-      filter.name = { $regex: query.search.trim(), $options: 'i' };
+      filter.name = { $regex: query.search.trim(), $options: "i" };
     }
 
     return filter;
@@ -531,7 +531,7 @@ export class ShopService {
     id: string,
     activeOnly = false,
   ): Promise<PlainCategory> {
-    const categoryId = toObjectId(id, 'Category id is invalid.');
+    const categoryId = toObjectId(id, "Category id is invalid.");
     const filter: QueryFilter<CategoryDocument> = { _id: categoryId };
 
     if (activeOnly) {
@@ -544,18 +544,18 @@ export class ShopService {
       .exec();
 
     if (!category) {
-      throw new NotFoundException('Category not found.');
+      throw new NotFoundException("Category not found.");
     }
 
     return category;
   }
 
   private async ensureCategoryExists(id: string): Promise<void> {
-    const categoryId = toObjectId(id, 'Category id is invalid.');
+    const categoryId = toObjectId(id, "Category id is invalid.");
     const exists = await this.categoryModel.exists({ _id: categoryId });
 
     if (!exists) {
-      throw new BadRequestException('Category does not exist.');
+      throw new BadRequestException("Category does not exist.");
     }
   }
 
@@ -564,17 +564,17 @@ export class ShopService {
     excludeId?: string,
   ): Promise<void> {
     const filter: QueryFilter<CategoryDocument> = {
-      name: { $regex: `^${escapeRegex(name)}$`, $options: 'i' },
+      name: { $regex: `^${escapeRegex(name)}$`, $options: "i" },
     };
 
     if (excludeId) {
-      filter._id = { $ne: toObjectId(excludeId, 'Category id is invalid.') };
+      filter._id = { $ne: toObjectId(excludeId, "Category id is invalid.") };
     }
 
     const exists = await this.categoryModel.exists(filter);
 
     if (exists) {
-      throw new ConflictException('Category name already exists.');
+      throw new ConflictException("Category name already exists.");
     }
   }
 
@@ -585,7 +585,7 @@ export class ShopService {
     const baseSlug = slugify(value);
 
     if (!baseSlug) {
-      throw new BadRequestException('Slug could not be generated.');
+      throw new BadRequestException("Slug could not be generated.");
     }
 
     let slug = baseSlug;
@@ -607,16 +607,16 @@ export class ShopService {
     const slug = slugify(value);
 
     if (!slug) {
-      throw new BadRequestException('Slug could not be generated.');
+      throw new BadRequestException("Slug could not be generated.");
     }
 
     const exists = await model.exists({
       slug,
-      _id: { $ne: toObjectId(excludeId, 'Document id is invalid.') },
+      _id: { $ne: toObjectId(excludeId, "Document id is invalid.") },
     } as QueryFilter<T>);
 
     if (exists) {
-      throw new ConflictException('Slug already exists.');
+      throw new ConflictException("Slug already exists.");
     }
 
     return slug;
@@ -634,8 +634,8 @@ export class ShopService {
         { $match: { product: productId } },
         {
           $group: {
-            _id: '$product',
-            averageRating: { $avg: '$rating' },
+            _id: "$product",
+            averageRating: { $avg: "$rating" },
             reviewCount: { $sum: 1 },
           },
         },

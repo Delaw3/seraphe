@@ -3,10 +3,10 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, QueryFilter, Types } from 'mongoose';
-import { ApiResponse } from '../shop/interfaces/api-response.interface';
+} from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, QueryFilter, Types } from "mongoose";
+import { ApiResponse } from "../shop/interfaces/api-response.interface";
 import {
   createApiResponse,
   createPaginationMeta,
@@ -14,11 +14,11 @@ import {
   omitInternalFields,
   slugify,
   toObjectId,
-} from '../shop/shop.utils';
-import { CreateBeautyTipDto } from './dto/create-beauty-tip.dto';
-import { QueryBeautyTipsDto } from './dto/query-beauty-tips.dto';
-import { UpdateBeautyTipDto } from './dto/update-beauty-tip.dto';
-import { BeautyTip, BeautyTipDocument } from './schemas/beauty-tip.schema';
+} from "../shop/shop.utils";
+import { CreateBeautyTipDto } from "./dto/create-beauty-tip.dto";
+import { QueryBeautyTipsDto } from "./dto/query-beauty-tips.dto";
+import { UpdateBeautyTipDto } from "./dto/update-beauty-tip.dto";
+import { BeautyTip, BeautyTipDocument } from "./schemas/beauty-tip.schema";
 
 type PlainBeautyTip = BeautyTip & { _id: Types.ObjectId };
 
@@ -50,7 +50,7 @@ export class BeautyTipsService {
     });
 
     return createApiResponse(
-      'Beauty tip created successfully.',
+      "Beauty tip created successfully.",
       tip.toObject(),
     );
   }
@@ -61,7 +61,7 @@ export class BeautyTipsService {
     return this.paginateTips(
       this.buildTipFilter(query, true),
       query,
-      'Beauty tips retrieved successfully.',
+      "Beauty tips retrieved successfully.",
     );
   }
 
@@ -71,7 +71,7 @@ export class BeautyTipsService {
     const response = await this.paginateTips(
       this.buildTipFilter(query, true),
       query,
-      'Beauty tips retrieved successfully.',
+      "Beauty tips retrieved successfully.",
     );
 
     return {
@@ -83,18 +83,18 @@ export class BeautyTipsService {
   async findAdminTip(id: string): Promise<ApiResponse<PlainBeautyTip>> {
     const tip = await this.beautyTipModel
       .findOne({
-        _id: toObjectId(id, 'Beauty tip id is invalid.'),
+        _id: toObjectId(id, "Beauty tip id is invalid."),
         isActive: true,
       })
       .lean<PlainBeautyTip>()
       .exec();
 
     if (!tip) {
-      throw new NotFoundException('Beauty tip not found.');
+      throw new NotFoundException("Beauty tip not found.");
     }
 
     return createApiResponse(
-      'Beauty tip retrieved successfully.',
+      "Beauty tip retrieved successfully.",
       omitInternalFields(tip),
     );
   }
@@ -108,24 +108,24 @@ export class BeautyTipsService {
       .exec();
 
     if (!tip) {
-      throw new NotFoundException('Beauty tip not found.');
+      throw new NotFoundException("Beauty tip not found.");
     }
 
-    return createApiResponse('Beauty tip retrieved successfully.', tip);
+    return createApiResponse("Beauty tip retrieved successfully.", tip);
   }
 
   async updateTip(
     id: string,
     dto: UpdateBeautyTipDto,
   ): Promise<ApiResponse<PlainBeautyTip>> {
-    const tipId = toObjectId(id, 'Beauty tip id is invalid.');
+    const tipId = toObjectId(id, "Beauty tip id is invalid.");
     const existing = await this.beautyTipModel
       .findOne({ _id: tipId, isActive: true })
       .lean()
       .exec();
 
     if (!existing) {
-      throw new NotFoundException('Beauty tip not found.');
+      throw new NotFoundException("Beauty tip not found.");
     }
 
     const update: Record<string, unknown> = { ...dto };
@@ -151,14 +151,14 @@ export class BeautyTipsService {
       .exec();
 
     if (!tip) {
-      throw new NotFoundException('Beauty tip not found.');
+      throw new NotFoundException("Beauty tip not found.");
     }
 
-    return createApiResponse('Beauty tip updated successfully.', tip);
+    return createApiResponse("Beauty tip updated successfully.", tip);
   }
 
   async deleteTip(id: string): Promise<ApiResponse<PlainBeautyTip>> {
-    const tipId = toObjectId(id, 'Beauty tip id is invalid.');
+    const tipId = toObjectId(id, "Beauty tip id is invalid.");
     const tip = await this.beautyTipModel
       .findOneAndUpdate(
         { _id: tipId, isActive: true },
@@ -169,10 +169,10 @@ export class BeautyTipsService {
       .exec();
 
     if (!tip) {
-      throw new NotFoundException('Beauty tip not found.');
+      throw new NotFoundException("Beauty tip not found.");
     }
 
-    return createApiResponse('Beauty tip deleted successfully.', tip);
+    return createApiResponse("Beauty tip deleted successfully.", tip);
   }
 
   async findPublicCategories(): Promise<
@@ -183,9 +183,9 @@ export class BeautyTipsService {
         { $match: { isActive: true } },
         {
           $group: {
-            _id: '$categorySlug',
-            name: { $first: '$category' },
-            slug: { $first: '$categorySlug' },
+            _id: "$categorySlug",
+            name: { $first: "$category" },
+            slug: { $first: "$categorySlug" },
           },
         },
         { $sort: { name: 1 } },
@@ -193,8 +193,8 @@ export class BeautyTipsService {
       ])
       .exec();
 
-    return createApiResponse('Beauty tip categories retrieved successfully.', [
-      { name: 'All', slug: 'all' },
+    return createApiResponse("Beauty tip categories retrieved successfully.", [
+      { name: "All", slug: "all" },
       ...categories,
     ]);
   }
@@ -236,17 +236,17 @@ export class BeautyTipsService {
       filter.isActive = true;
     }
 
-    if (query.category && query.category !== 'all') {
+    if (query.category && query.category !== "all") {
       filter.categorySlug = slugify(query.category);
     }
 
     if (query.search) {
       const search = query.search.trim();
       filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { summary: { $regex: search, $options: 'i' } },
-        { content: { $regex: search, $options: 'i' } },
-        { author: { $regex: search, $options: 'i' } },
+        { title: { $regex: search, $options: "i" } },
+        { summary: { $regex: search, $options: "i" } },
+        { content: { $regex: search, $options: "i" } },
+        { author: { $regex: search, $options: "i" } },
       ];
     }
 
@@ -257,7 +257,7 @@ export class BeautyTipsService {
     const baseSlug = slugify(value);
 
     if (!baseSlug) {
-      throw new BadRequestException('Slug could not be generated.');
+      throw new BadRequestException("Slug could not be generated.");
     }
 
     let slug = baseSlug;
@@ -278,16 +278,16 @@ export class BeautyTipsService {
     const slug = slugify(value);
 
     if (!slug) {
-      throw new BadRequestException('Slug could not be generated.');
+      throw new BadRequestException("Slug could not be generated.");
     }
 
     const exists = await this.beautyTipModel.exists({
       slug,
-      _id: { $ne: toObjectId(excludeId, 'Beauty tip id is invalid.') },
+      _id: { $ne: toObjectId(excludeId, "Beauty tip id is invalid.") },
     });
 
     if (exists) {
-      throw new ConflictException('Slug already exists.');
+      throw new ConflictException("Slug already exists.");
     }
 
     return slug;

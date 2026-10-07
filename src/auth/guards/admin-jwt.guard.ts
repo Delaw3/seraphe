@@ -3,9 +3,9 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
+} from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { Request } from "express";
 
 interface AdminTokenPayload {
   sub: string;
@@ -22,27 +22,26 @@ export class AdminJwtGuard implements CanActivate {
     const token = this.extractToken(request);
 
     if (!token) {
-      throw new UnauthorizedException('Missing bearer token.');
+      throw new UnauthorizedException("Missing bearer token.");
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync<AdminTokenPayload>(
-        token,
-      );
+      const payload =
+        await this.jwtService.verifyAsync<AdminTokenPayload>(token);
 
-      if (payload.role !== 'admin') {
-        throw new UnauthorizedException('Admin access required.');
+      if (payload.role !== "admin") {
+        throw new UnauthorizedException("Admin access required.");
       }
 
-      request['admin'] = payload;
+      request["admin"] = payload;
       return true;
     } catch {
-      throw new UnauthorizedException('Invalid or expired token.');
+      throw new UnauthorizedException("Invalid or expired token.");
     }
   }
 
   private extractToken(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+    const [type, token] = request.headers.authorization?.split(" ") ?? [];
+    return type === "Bearer" ? token : undefined;
   }
 }

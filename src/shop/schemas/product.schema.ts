@@ -1,6 +1,6 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
-import { Category } from './category.schema';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument, Types } from "mongoose";
+import { Category } from "./category.schema";
 
 export type ProductDocument = HydratedDocument<Product>;
 
@@ -61,4 +61,4 @@ ProductSchema.index({ slug: 1 }, { unique: true });
 ProductSchema.index({ category: 1 });
 ProductSchema.index({ isFeatured: 1 });
 ProductSchema.index({ isActive: 1 });
-ProductSchema.index({ name: 'text' });
+ProductSchema.index({ name: "text" });

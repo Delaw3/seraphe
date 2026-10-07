@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import {
   categoryExample,
   paginatedResponseExample,
@@ -8,31 +8,31 @@ import {
   reviewExample,
   shopHomeResponseExample,
   successResponseExample,
-} from '../common/swagger-response.examples';
-import { CreateReviewDto } from './dto/create-review.dto';
-import { QueryProductsDto } from './dto/query-products.dto';
-import { QueryReviewsDto } from './dto/query-reviews.dto';
-import { ShopService } from './shop.service';
+} from "../common/swagger-response.examples";
+import { CreateReviewDto } from "./dto/create-review.dto";
+import { QueryProductsDto } from "./dto/query-products.dto";
+import { QueryReviewsDto } from "./dto/query-reviews.dto";
+import { ShopService } from "./shop.service";
 
-@ApiTags('shop')
-@Controller('api/shop')
+@ApiTags("shop")
+@Controller("api/shop")
 export class PublicShopController {
   constructor(private readonly shopService: ShopService) {}
 
   @Get()
   @ApiOkResponse({
-    description: 'Get shop home data.',
+    description: "Get shop home data.",
     schema: { example: shopHomeResponseExample },
   })
   getShopHome() {
     return this.shopService.getShopHome();
   }
 
-  @Get('categories')
+  @Get("categories")
   @ApiOkResponse({
-    description: 'List active categories.',
+    description: "List active categories.",
     schema: {
-      example: successResponseExample('Categories retrieved successfully.', [
+      example: successResponseExample("Categories retrieved successfully.", [
         categoryExample,
       ]),
     },
@@ -41,11 +41,11 @@ export class PublicShopController {
     return this.shopService.findPublicCategories();
   }
 
-  @Get('products')
+  @Get("products")
   @ApiOkResponse({
-    description: 'List active products.',
+    description: "List active products.",
     schema: {
-      example: paginatedResponseExample('Products retrieved successfully.', [
+      example: paginatedResponseExample("Products retrieved successfully.", [
         productExample,
       ]),
     },
@@ -54,43 +54,43 @@ export class PublicShopController {
     return this.shopService.findPublicProducts(query);
   }
 
-  @Get('products/:slug')
+  @Get("products/:slug")
   @ApiOkResponse({
-    description: 'Get product details with related products.',
+    description: "Get product details with related products.",
     schema: { example: productDetailResponseExample },
   })
-  findProduct(@Param('slug') slug: string) {
+  findProduct(@Param("slug") slug: string) {
     return this.shopService.findPublicProductBySlug(slug);
   }
 
-  @Post('products/:slug/reviews')
+  @Post("products/:slug/reviews")
   @ApiCreatedResponse({
-    description: 'Submit a product review.',
+    description: "Submit a product review.",
     schema: {
       example: successResponseExample(
-        'Review submitted successfully.',
+        "Review submitted successfully.",
         reviewExample,
       ),
     },
   })
   createProductReview(
-    @Param('slug') slug: string,
+    @Param("slug") slug: string,
     @Body() dto: CreateReviewDto,
   ) {
     return this.shopService.createProductReview(slug, dto);
   }
 
-  @Get('products/:slug/reviews')
+  @Get("products/:slug/reviews")
   @ApiOkResponse({
-    description: 'List reviews for a product.',
+    description: "List reviews for a product.",
     schema: {
-      example: paginatedResponseExample('Reviews retrieved successfully.', [
+      example: paginatedResponseExample("Reviews retrieved successfully.", [
         reviewExample,
       ]),
     },
   })
   findProductReviews(
-    @Param('slug') slug: string,
+    @Param("slug") slug: string,
     @Query() query: QueryReviewsDto,
   ) {
     return this.shopService.findProductReviewsBySlug(slug, query);

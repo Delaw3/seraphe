@@ -2,8 +2,8 @@ import {
   ApiHideProperty,
   ApiProperty,
   ApiPropertyOptional,
-} from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+} from "@nestjs/swagger";
+import { Transform, Type } from "class-transformer";
 import {
   ArrayMaxSize,
   IsArray,
@@ -15,14 +15,14 @@ import {
   IsUrl,
   Min,
   MinLength,
-} from 'class-validator';
+} from "class-validator";
 
 const toStringArray = (value: unknown) => {
   if (Array.isArray(value)) {
     return value.map((item) => String(item).trim()).filter(Boolean);
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return value
       .split(/[\n,]+/)
       .map((item) => item.trim())
@@ -33,58 +33,58 @@ const toStringArray = (value: unknown) => {
 };
 
 export class CreateTrendDto {
-  @ApiProperty({ example: 'The Rise of Neurocosmetics' })
+  @ApiProperty({ example: "The Rise of Neurocosmetics" })
   @IsString()
   @MinLength(3)
   title!: string;
 
   @ApiHideProperty()
   @Transform(({ value }) =>
-    typeof value === 'string' && !value.trim() ? undefined : value,
+    typeof value === "string" && !value.trim() ? undefined : value,
   )
   @IsOptional()
   @IsString()
   @MinLength(3)
   slug?: string;
 
-  @ApiProperty({ example: 'Skincare' })
+  @ApiProperty({ example: "Skincare" })
   @IsString()
   @MinLength(2)
   focusArea!: string;
 
-  @ApiPropertyOptional({ example: 'Trending Now' })
+  @ApiPropertyOptional({ example: "Trending Now" })
   @IsOptional()
   @IsString()
   label?: string;
 
   @ApiProperty({
     example:
-      'Explore how topicals formulated for skin-stress responses are changing beauty.',
+      "Explore how topicals formulated for skin-stress responses are changing beauty.",
   })
   @IsString()
   @MinLength(10)
   summary!: string;
 
-  @ApiProperty({ example: 'Full trend analysis content.' })
+  @ApiProperty({ example: "Full trend analysis content." })
   @IsString()
   @MinLength(20)
   content!: string;
 
-  @ApiPropertyOptional({ example: 'Seraphe Editorial' })
+  @ApiPropertyOptional({ example: "Seraphe Editorial" })
   @IsOptional()
   @IsString()
   author?: string;
 
   @ApiProperty({
-    example: 'https://cdn.seraphebeauty.org/trends/neurocosmetics.jpg',
+    example: "https://cdn.seraphebeauty.org/trends/neurocosmetics.jpg",
   })
   @IsUrl()
   featureImage!: string;
 
   @ApiPropertyOptional({
     example: [
-      'https://cdn.seraphebeauty.org/trends/neurocosmetics-1.jpg',
-      'https://cdn.seraphebeauty.org/trends/neurocosmetics-2.jpg',
+      "https://cdn.seraphebeauty.org/trends/neurocosmetics-1.jpg",
+      "https://cdn.seraphebeauty.org/trends/neurocosmetics-2.jpg",
     ],
   })
   @IsOptional()
@@ -95,7 +95,7 @@ export class CreateTrendDto {
   images?: string[];
 
   @ApiPropertyOptional({
-    example: ['#neurocosmetics', '#skincare', '#skinbarrier'],
+    example: ["#neurocosmetics", "#skincare", "#skinbarrier"],
   })
   @IsOptional()
   @Transform(({ value }) => toStringArray(value))
@@ -110,7 +110,7 @@ export class CreateTrendDto {
   @Min(1)
   readTimeMinutes!: number;
 
-  @ApiPropertyOptional({ example: '2026-06-01T00:00:00.000Z' })
+  @ApiPropertyOptional({ example: "2026-06-01T00:00:00.000Z" })
   @IsOptional()
   @IsDateString()
   publishedAt?: string;

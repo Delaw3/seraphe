@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { AuthModule } from '../auth/auth.module';
-import { AdminTeamController } from './admin-team.controller';
-import { PublicTeamController } from './public-team.controller';
-import { TeamMember, TeamMemberSchema } from './schemas/team-member.schema';
-import { TeamService } from './team.service';
+import { Module } from "@nestjs/common";
+import { MongooseModule } from "@nestjs/mongoose";
+import { AuthModule } from "../auth/auth.module";
+import { AdminTeamController } from "./admin-team.controller";
+import { PublicTeamController } from "./public-team.controller";
+import { TeamMember, TeamMemberSchema } from "./schemas/team-member.schema";
+import { TeamService } from "./team.service";
 
 @Module({
   imports: [

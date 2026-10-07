@@ -1,6 +1,6 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsMongoId, IsOptional, Max, Min } from 'class-validator';
+import { ApiPropertyOptional } from "@nestjs/swagger";
+import { Type } from "class-transformer";
+import { IsMongoId, IsOptional, Max, Min } from "class-validator";
 
 export class QueryReviewsDto {
   @ApiPropertyOptional({ default: 1 })
@@ -18,7 +18,7 @@ export class QueryReviewsDto {
 }
 
 export class AdminQueryReviewsDto extends QueryReviewsDto {
-  @ApiPropertyOptional({ description: 'Filter reviews by product ObjectId.' })
+  @ApiPropertyOptional({ description: "Filter reviews by product ObjectId." })
   @IsOptional()
   @IsMongoId()
   product?: string;

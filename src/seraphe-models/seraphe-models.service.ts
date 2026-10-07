@@ -1,20 +1,20 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, QueryFilter, Types } from 'mongoose';
-import { ApiResponse } from '../shop/interfaces/api-response.interface';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, QueryFilter, Types } from "mongoose";
+import { ApiResponse } from "../shop/interfaces/api-response.interface";
 import {
   createApiResponse,
   createPaginationMeta,
   omitInternalFields,
   toObjectId,
-} from '../shop/shop.utils';
-import { CreateSerapheModelDto } from './dto/create-seraphe-model.dto';
-import { QuerySerapheModelsDto } from './dto/query-seraphe-models.dto';
-import { UpdateSerapheModelDto } from './dto/update-seraphe-model.dto';
+} from "../shop/shop.utils";
+import { CreateSerapheModelDto } from "./dto/create-seraphe-model.dto";
+import { QuerySerapheModelsDto } from "./dto/query-seraphe-models.dto";
+import { UpdateSerapheModelDto } from "./dto/update-seraphe-model.dto";
 import {
   SerapheModel,
   SerapheModelDocument,
-} from './schemas/seraphe-model.schema';
+} from "./schemas/seraphe-model.schema";
 
 type PlainSerapheModel = SerapheModel & { _id: Types.ObjectId };
 
@@ -39,7 +39,7 @@ export class SerapheModelsService {
     });
 
     return createApiResponse(
-      'Seraphe model created successfully.',
+      "Seraphe model created successfully.",
       model.toObject(),
     );
   }
@@ -50,7 +50,7 @@ export class SerapheModelsService {
     return this.paginateModels(
       this.buildModelFilter(query),
       query,
-      'Seraphe models retrieved successfully.',
+      "Seraphe models retrieved successfully.",
     );
   }
 
@@ -60,7 +60,7 @@ export class SerapheModelsService {
     const response = await this.paginateModels(
       this.buildModelFilter(query),
       query,
-      'Seraphe models retrieved successfully.',
+      "Seraphe models retrieved successfully.",
     );
 
     return {
@@ -71,31 +71,31 @@ export class SerapheModelsService {
 
   async findAdminModel(id: string): Promise<ApiResponse<PlainSerapheModel>> {
     const model = await this.serapheModelModel
-      .findById(toObjectId(id, 'Seraphe model id is invalid.'))
+      .findById(toObjectId(id, "Seraphe model id is invalid."))
       .lean<PlainSerapheModel>()
       .exec();
 
     if (!model) {
-      throw new NotFoundException('Seraphe model not found.');
+      throw new NotFoundException("Seraphe model not found.");
     }
 
-    return createApiResponse('Seraphe model retrieved successfully.', model);
+    return createApiResponse("Seraphe model retrieved successfully.", model);
   }
 
   async findPublicModelById(
     id: string,
   ): Promise<ApiResponse<PlainSerapheModel>> {
     const model = await this.serapheModelModel
-      .findById(toObjectId(id, 'Seraphe model id is invalid.'))
+      .findById(toObjectId(id, "Seraphe model id is invalid."))
       .lean<PlainSerapheModel>()
       .exec();
 
     if (!model) {
-      throw new NotFoundException('Seraphe model not found.');
+      throw new NotFoundException("Seraphe model not found.");
     }
 
     return createApiResponse(
-      'Seraphe model retrieved successfully.',
+      "Seraphe model retrieved successfully.",
       omitInternalFields(model),
     );
   }
@@ -104,14 +104,14 @@ export class SerapheModelsService {
     id: string,
     dto: UpdateSerapheModelDto,
   ): Promise<ApiResponse<PlainSerapheModel>> {
-    const modelId = toObjectId(id, 'Seraphe model id is invalid.');
+    const modelId = toObjectId(id, "Seraphe model id is invalid.");
     const existing = await this.serapheModelModel
       .findById(modelId)
       .lean()
       .exec();
 
     if (!existing) {
-      throw new NotFoundException('Seraphe model not found.');
+      throw new NotFoundException("Seraphe model not found.");
     }
 
     const update: Record<string, unknown> = { ...dto };
@@ -128,30 +128,30 @@ export class SerapheModelsService {
       .exec();
 
     if (!model) {
-      throw new NotFoundException('Seraphe model not found.');
+      throw new NotFoundException("Seraphe model not found.");
     }
 
-    return createApiResponse('Seraphe model updated successfully.', model);
+    return createApiResponse("Seraphe model updated successfully.", model);
   }
 
   async deleteModel(id: string): Promise<ApiResponse<PlainSerapheModel>> {
     const model = await this.serapheModelModel
-      .findByIdAndDelete(toObjectId(id, 'Seraphe model id is invalid.'))
+      .findByIdAndDelete(toObjectId(id, "Seraphe model id is invalid."))
       .lean<PlainSerapheModel>()
       .exec();
 
     if (!model) {
-      throw new NotFoundException('Seraphe model not found.');
+      throw new NotFoundException("Seraphe model not found.");
     }
 
-    return createApiResponse('Seraphe model deleted successfully.', model);
+    return createApiResponse("Seraphe model deleted successfully.", model);
   }
 
   async findPublicCategories(): Promise<
     ApiResponse<Array<{ name: string; slug: string }>>
   > {
     return createApiResponse(
-      'Seraphe model categories retrieved successfully.',
+      "Seraphe model categories retrieved successfully.",
       [],
     );
   }
@@ -191,10 +191,10 @@ export class SerapheModelsService {
     if (query.search) {
       const search = query.search.trim();
       filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { specialty: { $regex: search, $options: 'i' } },
-        { bio: { $regex: search, $options: 'i' } },
-        { hobbies: { $regex: search, $options: 'i' } },
+        { name: { $regex: search, $options: "i" } },
+        { specialty: { $regex: search, $options: "i" } },
+        { bio: { $regex: search, $options: "i" } },
+        { hobbies: { $regex: search, $options: "i" } },
       ];
     }
 

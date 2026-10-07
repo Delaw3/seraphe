@@ -1,25 +1,25 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Query } from "@nestjs/common";
+import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import {
   paginatedResponseExample,
   teamMemberExample,
   teamSectionsResponseExample,
   teamGroupedResponseExample,
-} from '../common/swagger-response.examples';
-import { QueryTeamMembersDto } from './dto/query-team-members.dto';
-import { TeamService } from './team.service';
+} from "../common/swagger-response.examples";
+import { QueryTeamMembersDto } from "./dto/query-team-members.dto";
+import { TeamService } from "./team.service";
 
-@ApiTags('team')
-@Controller('api/team')
+@ApiTags("team")
+@Controller("api/team")
 export class PublicTeamController {
   constructor(private readonly teamService: TeamService) {}
 
   @Get()
   @ApiOkResponse({
-    description: 'List active team members.',
+    description: "List active team members.",
     schema: {
       example: paginatedResponseExample(
-        'Team members retrieved successfully.',
+        "Team members retrieved successfully.",
         [teamMemberExample],
       ),
     },
@@ -28,18 +28,18 @@ export class PublicTeamController {
     return this.teamService.findPublicMembers(query);
   }
 
-  @Get('grouped')
+  @Get("grouped")
   @ApiOkResponse({
-    description: 'List active team members grouped by section.',
+    description: "List active team members grouped by section.",
     schema: { example: teamGroupedResponseExample },
   })
   findGroupedMembers() {
     return this.teamService.findPublicGroupedMembers();
   }
 
-  @Get('sections')
+  @Get("sections")
   @ApiOkResponse({
-    description: 'List team sections.',
+    description: "List team sections.",
     schema: { example: teamSectionsResponseExample },
   })
   findSections() {

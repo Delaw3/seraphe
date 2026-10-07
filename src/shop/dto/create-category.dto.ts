@@ -2,8 +2,8 @@ import {
   ApiHideProperty,
   ApiProperty,
   ApiPropertyOptional,
-} from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+} from "@nestjs/swagger";
+import { Transform } from "class-transformer";
 import {
   IsInt,
   IsOptional,
@@ -11,30 +11,30 @@ import {
   IsUrl,
   Min,
   MinLength,
-} from 'class-validator';
+} from "class-validator";
 
 export class CreateCategoryDto {
-  @ApiProperty({ example: 'Skincare' })
+  @ApiProperty({ example: "Skincare" })
   @IsString()
   @MinLength(2)
   name!: string;
 
   @ApiHideProperty()
   @Transform(({ value }) =>
-    typeof value === 'string' && !value.trim() ? undefined : value,
+    typeof value === "string" && !value.trim() ? undefined : value,
   )
   @IsOptional()
   @IsString()
   @MinLength(2)
   slug?: string;
 
-  @ApiPropertyOptional({ example: 'Beauty products for healthy skin.' })
+  @ApiPropertyOptional({ example: "Beauty products for healthy skin." })
   @IsOptional()
   @IsString()
   description?: string;
 
   @ApiPropertyOptional({
-    example: 'https://example.com/categories/skincare.jpg',
+    example: "https://example.com/categories/skincare.jpg",
   })
   @IsOptional()
   @IsUrl()

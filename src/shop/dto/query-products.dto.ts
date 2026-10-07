@@ -1,6 +1,13 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsIn, IsMongoId, IsOptional, IsString, Max, Min } from 'class-validator';
+import { ApiPropertyOptional } from "@nestjs/swagger";
+import { Type } from "class-transformer";
+import {
+  IsIn,
+  IsMongoId,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from "class-validator";
 
 export class QueryProductsDto {
   @ApiPropertyOptional({ default: 1 })
@@ -16,24 +23,26 @@ export class QueryProductsDto {
   @Max(100)
   limit?: number = 12;
 
-  @ApiPropertyOptional({ description: 'Category id for admin, slug for public.' })
+  @ApiPropertyOptional({
+    description: "Category id for admin, slug for public.",
+  })
   @IsOptional()
   @IsString()
   category?: string;
 
-  @ApiPropertyOptional({ example: 'cream' })
+  @ApiPropertyOptional({ example: "cream" })
   @IsOptional()
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ enum: ['true', 'false'] })
+  @ApiPropertyOptional({ enum: ["true", "false"] })
   @IsOptional()
-  @IsIn(['true', 'false'])
+  @IsIn(["true", "false"])
   featured?: string;
 }
 
 export class AdminQueryProductsDto extends QueryProductsDto {
-  @ApiPropertyOptional({ description: 'Category ObjectId.' })
+  @ApiPropertyOptional({ description: "Category ObjectId." })
   @IsOptional()
   @IsMongoId()
   declare category?: string;

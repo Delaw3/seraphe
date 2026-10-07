@@ -1,5 +1,5 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { ApiPropertyOptional } from "@nestjs/swagger";
+import { Type } from "class-transformer";
 import {
   IsEmail,
   IsInt,
@@ -8,52 +8,52 @@ import {
   IsUrl,
   Min,
   MinLength,
-} from 'class-validator';
+} from "class-validator";
 
 export class CreateTeamMemberDto {
-  @ApiPropertyOptional({ example: 'Jane Doe' })
+  @ApiPropertyOptional({ example: "Jane Doe" })
   @IsOptional()
   @IsString()
   @MinLength(2)
   name?: string;
 
-  @ApiPropertyOptional({ example: 'Managing Director' })
+  @ApiPropertyOptional({ example: "Managing Director" })
   @IsOptional()
   @IsString()
   @MinLength(2)
   role?: string;
 
-  @ApiPropertyOptional({ example: 'Beauty Science Team' })
+  @ApiPropertyOptional({ example: "Beauty Science Team" })
   @IsOptional()
   @IsString()
   @MinLength(2)
   section?: string;
 
   @ApiPropertyOptional({
-    example: 'https://cdn.seraphebeauty.org/team/jane-doe.jpg',
+    example: "https://cdn.seraphebeauty.org/team/jane-doe.jpg",
   })
   @IsOptional()
   @IsUrl()
   image?: string;
 
   @ApiPropertyOptional({
-    example: 'Jane leads product research and beauty science strategy.',
+    example: "Jane leads product research and beauty science strategy.",
   })
   @IsOptional()
   @IsString()
   bio?: string;
 
-  @ApiPropertyOptional({ example: 'jane@seraphebeauty.org' })
+  @ApiPropertyOptional({ example: "jane@seraphebeauty.org" })
   @IsOptional()
   @IsEmail()
   email?: string;
 
-  @ApiPropertyOptional({ example: 'https://linkedin.com/in/janedoe' })
+  @ApiPropertyOptional({ example: "https://linkedin.com/in/janedoe" })
   @IsOptional()
   @IsUrl()
   linkedin?: string;
 
-  @ApiPropertyOptional({ example: 'https://instagram.com/janedoe' })
+  @ApiPropertyOptional({ example: "https://instagram.com/janedoe" })
   @IsOptional()
   @IsUrl()
   instagram?: string;

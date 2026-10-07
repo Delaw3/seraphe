@@ -6,6 +6,7 @@ import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
 import { BeautyTipsModule } from "./beauty-tips/beauty-tips.module";
 import { CommunityModule } from "./community/community.module";
+import { HealthModule } from "./health/health.module";
 import { LifestyleModule } from "./lifestyle/lifestyle.module";
 import { MailModule } from "./mail/mail.module";
 import { SerapheModelsModule } from "./seraphe-models/seraphe-models.module";
@@ -27,6 +28,7 @@ import { TrendsModule } from "./trends/trends.module";
     AuthModule,
     BeautyTipsModule,
     CommunityModule,
+    HealthModule,
     LifestyleModule,
     MailModule,
     SerapheModelsModule,

@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument } from "mongoose";
 
 export type SerapheModelDocument = HydratedDocument<SerapheModel>;
 
@@ -30,8 +30,8 @@ export class SerapheModel {
 export const SerapheModelSchema = SchemaFactory.createForClass(SerapheModel);
 
 SerapheModelSchema.index({
-  name: 'text',
-  specialty: 'text',
-  bio: 'text',
-  hobbies: 'text',
+  name: "text",
+  specialty: "text",
+  bio: "text",
+  hobbies: "text",
 });

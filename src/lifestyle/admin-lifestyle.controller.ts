@@ -9,37 +9,37 @@ import {
   Put,
   Query,
   UseGuards,
-} from '@nestjs/common';
+} from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiTags,
-} from '@nestjs/swagger';
-import { AdminJwtGuard } from '../auth/guards/admin-jwt.guard';
+} from "@nestjs/swagger";
+import { AdminJwtGuard } from "../auth/guards/admin-jwt.guard";
 import {
   lifestyleArticleExample,
   paginatedResponseExample,
   successResponseExample,
-} from '../common/swagger-response.examples';
-import { CreateLifestyleArticleDto } from './dto/create-lifestyle-article.dto';
-import { QueryLifestyleArticlesDto } from './dto/query-lifestyle-articles.dto';
-import { UpdateLifestyleArticleDto } from './dto/update-lifestyle-article.dto';
-import { LifestyleService } from './lifestyle.service';
+} from "../common/swagger-response.examples";
+import { CreateLifestyleArticleDto } from "./dto/create-lifestyle-article.dto";
+import { QueryLifestyleArticlesDto } from "./dto/query-lifestyle-articles.dto";
+import { UpdateLifestyleArticleDto } from "./dto/update-lifestyle-article.dto";
+import { LifestyleService } from "./lifestyle.service";
 
-@ApiTags('admin lifestyle')
+@ApiTags("admin lifestyle")
 @ApiBearerAuth()
 @UseGuards(AdminJwtGuard)
-@Controller('api/admin/lifestyle')
+@Controller("api/admin/lifestyle")
 export class AdminLifestyleController {
   constructor(private readonly lifestyleService: LifestyleService) {}
 
   @Post()
   @ApiCreatedResponse({
-    description: 'Create a lifestyle article.',
+    description: "Create a lifestyle article.",
     schema: {
       example: successResponseExample(
-        'Lifestyle article created successfully.',
+        "Lifestyle article created successfully.",
         lifestyleArticleExample,
       ),
     },
@@ -50,10 +50,10 @@ export class AdminLifestyleController {
 
   @Get()
   @ApiOkResponse({
-    description: 'List lifestyle articles.',
+    description: "List lifestyle articles.",
     schema: {
       example: paginatedResponseExample(
-        'Lifestyle articles retrieved successfully.',
+        "Lifestyle articles retrieved successfully.",
         [lifestyleArticleExample],
       ),
     },
@@ -62,46 +62,49 @@ export class AdminLifestyleController {
     return this.lifestyleService.findAdminArticles(query);
   }
 
-  @Get(':id')
+  @Get(":id")
   @ApiOkResponse({
-    description: 'Get one lifestyle article.',
+    description: "Get one lifestyle article.",
     schema: {
       example: successResponseExample(
-        'Lifestyle article retrieved successfully.',
+        "Lifestyle article retrieved successfully.",
         lifestyleArticleExample,
       ),
     },
   })
-  findArticle(@Param('id') id: string) {
+  findArticle(@Param("id") id: string) {
     return this.lifestyleService.findAdminArticle(id);
   }
 
-  @Patch(':id')
-  @Put(':id')
+  @Patch(":id")
+  @Put(":id")
   @ApiOkResponse({
-    description: 'Update a lifestyle article.',
+    description: "Update a lifestyle article.",
     schema: {
       example: successResponseExample(
-        'Lifestyle article updated successfully.',
+        "Lifestyle article updated successfully.",
         lifestyleArticleExample,
       ),
     },
   })
-  updateArticle(@Param('id') id: string, @Body() dto: UpdateLifestyleArticleDto) {
+  updateArticle(
+    @Param("id") id: string,
+    @Body() dto: UpdateLifestyleArticleDto,
+  ) {
     return this.lifestyleService.updateArticle(id, dto);
   }
 
-  @Delete(':id')
+  @Delete(":id")
   @ApiOkResponse({
-    description: 'Delete a lifestyle article.',
+    description: "Delete a lifestyle article.",
     schema: {
       example: successResponseExample(
-        'Lifestyle article deleted successfully.',
+        "Lifestyle article deleted successfully.",
         lifestyleArticleExample,
       ),
     },
   })
-  deleteArticle(@Param('id') id: string) {
+  deleteArticle(@Param("id") id: string) {
     return this.lifestyleService.deleteArticle(id);
   }
 }

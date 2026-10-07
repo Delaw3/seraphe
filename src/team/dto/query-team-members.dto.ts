@@ -1,6 +1,6 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsOptional, IsString, Max, Min } from 'class-validator';
+import { ApiPropertyOptional } from "@nestjs/swagger";
+import { Type } from "class-transformer";
+import { IsOptional, IsString, Max, Min } from "class-validator";
 
 export class QueryTeamMembersDto {
   @ApiPropertyOptional({ default: 1 })
@@ -16,12 +16,12 @@ export class QueryTeamMembersDto {
   @Max(100)
   limit?: number = 12;
 
-  @ApiPropertyOptional({ example: 'beauty-science-team' })
+  @ApiPropertyOptional({ example: "beauty-science-team" })
   @IsOptional()
   @IsString()
   section?: string;
 
-  @ApiPropertyOptional({ example: 'director' })
+  @ApiPropertyOptional({ example: "director" })
   @IsOptional()
   @IsString()
   search?: string;

@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument } from "mongoose";
 
 export type TrendDocument = HydratedDocument<Trend>;
 
@@ -61,7 +61,7 @@ TrendSchema.index({ isActive: 1 });
 TrendSchema.index({ isFeatured: 1 });
 TrendSchema.index({ order: 1 });
 TrendSchema.index({
-  title: 'text',
-  summary: 'text',
-  content: 'text',
+  title: "text",
+  summary: "text",
+  content: "text",
 });
