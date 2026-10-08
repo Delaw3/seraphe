@@ -2,8 +2,22 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "declaration": false,
+    "declarationMap": false,
     "sourceMap": false,
-    "incremental": false
+    "inlineSources": false,
+    "incremental": false,
+    "tsBuildInfoFile": null,
+    "lib": ["ES2023"],
+    "types": ["node"]
   },
-  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "test",
+    "dist",
+    "coverage",
+    "scripts",
+    ".agents",
+    "**/*.spec.ts"
+  ]
 }
