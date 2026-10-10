@@ -10,7 +10,7 @@ export class MailController {
 
   @Post("test")
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ description: "Sends a Gmail SMTP test email." })
+  @ApiOkResponse({ description: "Sends a Brevo test email." })
   async sendTestEmail(
     @Body() dto: SendTestEmailDto,
   ): Promise<{ message: string; messageId?: string }> {

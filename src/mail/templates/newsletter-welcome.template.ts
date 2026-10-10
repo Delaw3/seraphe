@@ -1,3 +1,5 @@
+import { renderEmailLogoHeader } from "./email-branding";
+
 export interface NewsletterWelcomeTemplateOptions {
   name?: string;
 }
@@ -20,6 +22,7 @@ export function renderNewsletterWelcomeTemplate(
           <tr>
             <td align="center">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border:1px solid #eadbd3;">
+                ${renderEmailLogoHeader()}
                 <tr>
                   <td style="padding:34px 32px 10px;">
                     <p style="margin:0 0 8px;font-size:13px;letter-spacing:1.8px;text-transform:uppercase;color:#9b6b58;">

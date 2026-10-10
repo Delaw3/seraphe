@@ -1,3 +1,5 @@
+import { renderEmailLogoHeader } from "./email-branding";
+
 export interface PasswordResetOtpTemplateOptions {
   otp: string;
 }
@@ -18,6 +20,7 @@ export function renderPasswordResetOtpTemplate(
           <tr>
             <td align="center">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border:1px solid #eadbd3;">
+                ${renderEmailLogoHeader()}
                 <tr>
                   <td style="padding:32px;">
                     <p style="margin:0 0 8px;font-size:13px;letter-spacing:1.8px;text-transform:uppercase;color:#9b6b58;">

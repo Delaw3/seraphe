@@ -30,14 +30,7 @@ if (fs.existsSync(envPath)) {
 }
 
 async function sendTestEmail() {
-  const requiredEnv = [
-    "SMTP_HOST",
-    "SMTP_PORT",
-    "SMTP_SECURE",
-    "SMTP_USER",
-    "SMTP_PASSWORD",
-    "MAIL_FROM",
-  ];
+  const requiredEnv = ["SMTP_USER", "MAIL_FROM"];
   const missingEnv = requiredEnv.filter((key) => !process.env[key]);
 
   if (missingEnv.length > 0) {
@@ -46,27 +39,41 @@ async function sendTestEmail() {
     );
   }
 
+  const password = process.env.SMTP_PASSWORD || process.env.SMTP_PASS;
+
+  if (!password) {
+    throw new Error("Missing email environment variables: SMTP_PASS");
+  }
+
+  const host = process.env.SMTP_HOST || "smtp-relay.brevo.com";
+  const port = Number(process.env.SMTP_PORT || "587");
+  const secure =
+    process.env.SMTP_SECURE !== undefined
+      ? process.env.SMTP_SECURE === "true"
+      : port === 465;
+
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: process.env.SMTP_SECURE === "true",
+    host,
+    port,
+    secure,
+    requireTLS: !secure,
     auth: {
       user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASSWORD,
+      pass: password,
     },
   });
 
+  const to = process.env.TEST_EMAIL_TO || "lauphix1@gmail.com";
+  const fromName = process.env.MAIL_FROM_NAME || "Seraphe Beauty";
   const result = await transporter.sendMail({
-    from: `Seraphe Beauty <${process.env.MAIL_FROM}>`,
-    to: "lauphix1@gmail.com",
+    from: `"${fromName}" <${process.env.MAIL_FROM}>`,
+    to,
     subject: "Seraphe Beauty Email Test",
-    text: "Seraphe Beauty\n\nGmail SMTP has been configured successfully.",
+    text: "Seraphe Beauty\n\nBrevo SMTP has been configured successfully.",
     html: renderTestEmailTemplate(),
   });
 
-  console.log(
-    `Test email sent to lauphix1@gmail.com. Message ID: ${result.messageId}`,
-  );
+  console.log(`Test email sent to ${to}. Message ID: ${result.messageId}`);
 }
 
 sendTestEmail().catch((error) => {

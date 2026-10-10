@@ -16,6 +16,14 @@ export interface SendEmailOptions {
   html?: string;
 }
 
+export interface SentEmailResult extends SMTPTransport.SentMessageInfo {
+  messageId: string;
+}
+
+const DEFAULT_BREVO_SMTP_HOST = "smtp-relay.brevo.com";
+const DEFAULT_BREVO_SMTP_PORT = 587;
+const DEFAULT_FROM_NAME = "Seraphe Beauty";
+
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
@@ -23,20 +31,13 @@ export class MailService {
 
   constructor(private readonly configService: ConfigService) {}
 
-  async sendEmail(
-    options: SendEmailOptions,
-  ): Promise<SMTPTransport.SentMessageInfo> {
+  async sendEmail(options: SendEmailOptions): Promise<SentEmailResult> {
     const transporter = this.getTransporter();
-    const fromAddress = this.configService.get<string>("MAIL_FROM");
-
-    if (!fromAddress) {
-      this.logger.error("Email configuration is incomplete.");
-      throw new ServiceUnavailableException("Email service is not configured.");
-    }
+    const { address: fromAddress, name: fromName } = this.getFromConfig();
 
     try {
       const result = await transporter.sendMail({
-        from: `Seraphe Beauty <${fromAddress}>`,
+        from: `"${fromName}" <${fromAddress}>`,
         to: options.to,
         subject: options.subject,
         text: options.text,
@@ -46,7 +47,7 @@ export class MailService {
       this.logger.log(
         `Email sent to ${options.to} with message id ${result.messageId}.`,
       );
-      return result;
+      return result as SentEmailResult;
     } catch (error) {
       this.logger.error(
         `Failed to send email to ${options.to}: ${this.getErrorMessage(error)}`,
@@ -55,11 +56,11 @@ export class MailService {
     }
   }
 
-  async sendTestEmail(to: string): Promise<SMTPTransport.SentMessageInfo> {
+  async sendTestEmail(to: string): Promise<SentEmailResult> {
     return this.sendEmail({
       to: to.toLowerCase().trim(),
       subject: "Seraphe Beauty Email Test",
-      text: "Seraphe Beauty\n\nGmail SMTP has been configured successfully.",
+      text: "Seraphe Beauty\n\nEmail service has been configured successfully.",
       html: renderTestEmailTemplate(),
     });
   }
@@ -82,31 +83,36 @@ export class MailService {
     });
 
     this.logger.log(
-      `SMTP transport configured for ${smtpConfig.host}:${smtpConfig.port} with secure=${smtpConfig.secure}.`,
+      `Brevo SMTP transport configured for ${smtpConfig.host}:${smtpConfig.port} with secure=${smtpConfig.secure}.`,
     );
 
     return this.transporter;
   }
 
   private getSmtpConfig() {
-    const host = this.getTrimmedConfigValue("SMTP_HOST");
+    const host =
+      this.getTrimmedConfigValue("SMTP_HOST") ?? DEFAULT_BREVO_SMTP_HOST;
     const portValue = this.getTrimmedConfigValue("SMTP_PORT");
-    const port = Number(portValue);
+    const port = portValue
+      ? Number(portValue)
+      : DEFAULT_BREVO_SMTP_PORT;
     const secureValue = this.getTrimmedConfigValue("SMTP_SECURE");
     const secure = this.parseSecureValue(secureValue, port);
+    // Brevo relay credentials use SMTP_USER + SMTP_PASS (SMTP_PASSWORD kept as alias).
     const user = this.getTrimmedConfigValue("SMTP_USER");
-    const password = this.getTrimmedConfigValue("SMTP_PASSWORD");
+    const password =
+      this.getTrimmedConfigValue("SMTP_PASSWORD") ??
+      this.getTrimmedConfigValue("SMTP_PASS");
 
     if (
       !host ||
-      !portValue ||
       Number.isNaN(port) ||
       secure === undefined ||
       !user ||
       !password
     ) {
       this.logger.error(
-        `Email configuration is incomplete or invalid. SMTP_HOST=${this.describeConfigValue(host)}, SMTP_PORT=${this.describeConfigValue(portValue)}, SMTP_SECURE=${this.describeConfigValue(secureValue)}, SMTP_USER=${this.describeConfigValue(user)}, SMTP_PASSWORD=${this.describeConfigValue(password)}.`,
+        `Email configuration is incomplete or invalid. SMTP_HOST=${this.describeConfigValue(host)}, SMTP_PORT=${this.describeConfigValue(portValue ?? String(port))}, SMTP_SECURE=${this.describeConfigValue(secureValue)}, SMTP_USER=${this.describeConfigValue(user)}, SMTP_PASSWORD/SMTP_PASS=${password ? "set" : "missing"}.`,
       );
       throw new ServiceUnavailableException("Email service is not configured.");
     }
@@ -120,8 +126,27 @@ export class MailService {
     };
   }
 
+  private getFromConfig(): { address: string; name: string } {
+    // MAIL_FROM is the canonical var; EMAIL_FROM is accepted for Brevo setups.
+    const address =
+      this.getTrimmedConfigValue("MAIL_FROM") ??
+      this.getTrimmedConfigValue("EMAIL_FROM");
+    const name =
+      this.getTrimmedConfigValue("MAIL_FROM_NAME") ??
+      this.getTrimmedConfigValue("EMAIL_FROM_NAME") ??
+      DEFAULT_FROM_NAME;
+
+    if (!address) {
+      this.logger.error("Email configuration is incomplete.");
+      throw new ServiceUnavailableException("Email service is not configured.");
+    }
+
+    return { address, name };
+  }
+
   private getTrimmedConfigValue(key: string): string | undefined {
-    return this.configService.get<string>(key)?.trim();
+    const value = this.configService.get<string>(key)?.trim();
+    return value ? value : undefined;
   }
 
   private parseSecureValue(
@@ -151,3 +176,4 @@ export class MailService {
     return "Unknown error";
   }
 }
+
