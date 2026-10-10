@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsString, MinLength } from "class-validator";
+import { IsEmail, IsString, Length, MinLength } from "class-validator";
 
 export class SignUpDto {
   @ApiProperty({ example: "Seraphe Admin" })
@@ -15,4 +15,14 @@ export class SignUpDto {
   @IsString()
   @MinLength(8)
   password!: string;
+
+  @ApiProperty({
+    description:
+      "One-time signup code issued by a SUPER_ADMIN for this email address.",
+    example: "482913",
+  })
+  @IsString()
+  @Length(6, 6)
+  code!: string;
 }
+

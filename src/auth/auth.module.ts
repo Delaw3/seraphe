@@ -5,6 +5,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { AdminJwtGuard } from "./guards/admin-jwt.guard";
+import { SuperAdminGuard } from "./guards/super-admin.guard";
 import { Admin, AdminSchema } from "./schemas/admin.schema";
 import { MailModule } from "../mail/mail.module";
 import { RedisModule } from "../redis/redis.module";
@@ -26,7 +27,7 @@ import { RedisModule } from "../redis/redis.module";
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AdminJwtGuard],
-  exports: [AdminJwtGuard, JwtModule],
+  providers: [AuthService, AdminJwtGuard, SuperAdminGuard],
+  exports: [AdminJwtGuard, SuperAdminGuard, JwtModule],
 })
 export class AuthModule {}

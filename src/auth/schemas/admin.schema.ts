@@ -3,6 +3,11 @@ import { HydratedDocument } from "mongoose";
 
 export type AdminDocument = HydratedDocument<Admin>;
 
+export enum AdminRole {
+  ADMIN = "ADMIN",
+  SUPER_ADMIN = "SUPER_ADMIN",
+}
+
 @Schema({ timestamps: true, versionKey: false })
 export class Admin {
   @Prop({ required: true, trim: true })
@@ -13,6 +18,13 @@ export class Admin {
 
   @Prop({ required: true })
   passwordHash!: string;
+
+  @Prop({
+    type: String,
+    enum: Object.values(AdminRole),
+    default: AdminRole.ADMIN,
+  })
+  role!: AdminRole;
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin);

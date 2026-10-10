@@ -1,28 +1,34 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
 import { AdminRole } from "../schemas/admin.schema";
-
-export interface AdminTokenPayload {
-  sub: string;
-  email: string;
-  role: AdminRole | string;
-}
+import { AdminTokenPayload } from "./admin-jwt.guard";
 
 @Injectable()
-export class AdminJwtGuard implements CanActivate {
+export class SuperAdminGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    const token = this.extractToken(request);
+    const existingAdmin = request["admin"] as AdminTokenPayload | undefined;
 
-    if (!token) {
+    if (existingAdmin) {
+      if (existingAdmin.role !== AdminRole.SUPER_ADMIN) {
+        throw new ForbiddenException("Super admin access required.");
+      }
+
+      return true;
+    }
+
+    const [type, token] = request.headers.authorization?.split(" ") ?? [];
+
+    if (type !== "Bearer" || !token) {
       throw new UnauthorizedException("Missing bearer token.");
     }
 
@@ -30,24 +36,18 @@ export class AdminJwtGuard implements CanActivate {
       const payload =
         await this.jwtService.verifyAsync<AdminTokenPayload>(token);
 
-      if (
-        payload.role !== AdminRole.ADMIN &&
-        payload.role !== AdminRole.SUPER_ADMIN &&
-        // Backward compatibility with tokens issued before roles existed.
-        payload.role !== "admin"
-      ) {
-        throw new UnauthorizedException("Admin access required.");
+      if (payload.role !== AdminRole.SUPER_ADMIN) {
+        throw new ForbiddenException("Super admin access required.");
       }
 
       request["admin"] = payload;
       return true;
-    } catch {
+    } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw error;
+      }
+
       throw new UnauthorizedException("Invalid or expired token.");
     }
-  }
-
-  private extractToken(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(" ") ?? [];
-    return type === "Bearer" ? token : undefined;
   }
 }

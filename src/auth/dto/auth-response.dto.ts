@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { AdminRole } from "../schemas/admin.schema";
 
 class AdminProfileDto {
   @ApiProperty()
@@ -9,6 +10,9 @@ class AdminProfileDto {
 
   @ApiProperty()
   email!: string;
+
+  @ApiProperty({ enum: AdminRole, example: AdminRole.ADMIN })
+  role!: AdminRole;
 }
 
 export class AuthResponseDto {

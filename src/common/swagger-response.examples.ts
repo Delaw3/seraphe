@@ -4,6 +4,7 @@ export const authResponseExample = {
     id: "6690f3f5e7f9c1a001234567",
     name: "Seraphe Admin",
     email: "admin@seraphebeauty.org",
+    role: "ADMIN",
   },
 };
 
