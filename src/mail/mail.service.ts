@@ -5,8 +5,6 @@ import {
   ServiceUnavailableException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import nodemailer, { Transporter } from "nodemailer";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
 import { renderTestEmailTemplate } from "./templates/test-email.template";
 
 export interface SendEmailOptions {
@@ -16,44 +14,78 @@ export interface SendEmailOptions {
   html?: string;
 }
 
-export interface SentEmailResult extends SMTPTransport.SentMessageInfo {
+export interface SentEmailResult {
   messageId: string;
 }
 
-const DEFAULT_BREVO_SMTP_HOST = "smtp-relay.brevo.com";
-const DEFAULT_BREVO_SMTP_PORT = 587;
+interface BrevoSendEmailResponse {
+  messageId?: string;
+}
+
+const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 const DEFAULT_FROM_NAME = "Seraphe Beauty";
+const REQUEST_TIMEOUT_MS = 15_000;
 
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
-  private transporter?: Transporter<SMTPTransport.SentMessageInfo>;
 
   constructor(private readonly configService: ConfigService) {}
 
   async sendEmail(options: SendEmailOptions): Promise<SentEmailResult> {
-    const transporter = this.getTransporter();
+    const apiKey = this.getTrimmedConfigValue("BREVO_API_KEY");
     const { address: fromAddress, name: fromName } = this.getFromConfig();
+    const to = options.to.toLowerCase().trim();
+
+    if (!apiKey) {
+      this.logger.error(
+        "Email configuration is incomplete or invalid. BREVO_API_KEY=missing.",
+      );
+      throw new ServiceUnavailableException("Email service is not configured.");
+    }
+
+    if (!to) {
+      throw new InternalServerErrorException("Failed to send email.");
+    }
+
+    const payload: Record<string, unknown> = {
+      sender: { name: fromName, email: fromAddress },
+      to: [{ email: to }],
+      subject: options.subject,
+    };
+
+    if (options.html) {
+      payload.htmlContent = options.html;
+    }
+
+    if (options.text) {
+      payload.textContent = options.text;
+    }
+
+    let response: Response;
 
     try {
-      const result = await transporter.sendMail({
-        from: `"${fromName}" <${fromAddress}>`,
-        to: options.to,
-        subject: options.subject,
-        text: options.text,
-        html: options.html,
-      });
-
-      this.logger.log(
-        `Email sent to ${options.to} with message id ${result.messageId}.`,
-      );
-      return result as SentEmailResult;
+      response = await this.postToBrevo(apiKey, payload);
     } catch (error) {
       this.logger.error(
-        `Failed to send email to ${options.to}: ${this.getErrorMessage(error)}`,
+        `Failed to send email to ${to}: ${this.getErrorMessage(error)}`,
       );
       throw new InternalServerErrorException("Failed to send email.");
     }
+
+    if (!response.ok) {
+      const detail = await this.readErrorDetail(response);
+      this.logger.error(
+        `Brevo API rejected email to ${to} with status ${response.status}${detail ? `: ${detail}` : "."}`,
+      );
+      throw new InternalServerErrorException("Failed to send email.");
+    }
+
+    const messageId = await this.readMessageId(response, to);
+
+    this.logger.log(`Email sent to ${to} with message id ${messageId}.`);
+
+    return { messageId };
   }
 
   async sendTestEmail(to: string): Promise<SentEmailResult> {
@@ -65,69 +97,58 @@ export class MailService {
     });
   }
 
-  private getTransporter(): Transporter<SMTPTransport.SentMessageInfo> {
-    if (this.transporter) {
-      return this.transporter;
+  private async postToBrevo(
+    apiKey: string,
+    payload: Record<string, unknown>,
+  ): Promise<Response> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+    try {
+      return await fetch(BREVO_API_URL, {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          "api-key": apiKey,
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeout);
     }
-
-    const smtpConfig = this.getSmtpConfig();
-    this.transporter = nodemailer.createTransport({
-      host: smtpConfig.host,
-      port: smtpConfig.port,
-      secure: smtpConfig.secure,
-      requireTLS: !smtpConfig.secure,
-      auth: {
-        user: smtpConfig.user,
-        pass: smtpConfig.password,
-      },
-    });
-
-    this.logger.log(
-      `Brevo SMTP transport configured for ${smtpConfig.host}:${smtpConfig.port} with secure=${smtpConfig.secure}.`,
-    );
-
-    return this.transporter;
   }
 
-  private getSmtpConfig() {
-    const host =
-      this.getTrimmedConfigValue("SMTP_HOST") ?? DEFAULT_BREVO_SMTP_HOST;
-    const portValue = this.getTrimmedConfigValue("SMTP_PORT");
-    const port = portValue
-      ? Number(portValue)
-      : DEFAULT_BREVO_SMTP_PORT;
-    const secureValue = this.getTrimmedConfigValue("SMTP_SECURE");
-    const secure = this.parseSecureValue(secureValue, port);
-    // Brevo relay credentials use SMTP_USER + SMTP_PASS (SMTP_PASSWORD kept as alias).
-    const user = this.getTrimmedConfigValue("SMTP_USER");
-    const password =
-      this.getTrimmedConfigValue("SMTP_PASSWORD") ??
-      this.getTrimmedConfigValue("SMTP_PASS");
-
-    if (
-      !host ||
-      Number.isNaN(port) ||
-      secure === undefined ||
-      !user ||
-      !password
-    ) {
-      this.logger.error(
-        `Email configuration is incomplete or invalid. SMTP_HOST=${this.describeConfigValue(host)}, SMTP_PORT=${this.describeConfigValue(portValue ?? String(port))}, SMTP_SECURE=${this.describeConfigValue(secureValue)}, SMTP_USER=${this.describeConfigValue(user)}, SMTP_PASSWORD/SMTP_PASS=${password ? "set" : "missing"}.`,
+  private async readMessageId(
+    response: Response,
+    to: string,
+  ): Promise<string> {
+    try {
+      const body = (await response.json()) as BrevoSendEmailResponse;
+      if (body?.messageId) {
+        return body.messageId;
+      }
+    } catch (error) {
+      this.logger.warn(
+        `Brevo API response for ${to} did not include a message id: ${this.getErrorMessage(error)}`,
       );
-      throw new ServiceUnavailableException("Email service is not configured.");
     }
 
-    return {
-      host,
-      port,
-      secure,
-      user,
-      password,
-    };
+    return `brevo-${Date.now()}`;
+  }
+
+  private async readErrorDetail(response: Response): Promise<string> {
+    try {
+      const text = await response.text();
+      return text.slice(0, 500);
+    } catch {
+      return "";
+    }
   }
 
   private getFromConfig(): { address: string; name: string } {
-    // MAIL_FROM is the canonical var; EMAIL_FROM is accepted for Brevo setups.
+    // MAIL_FROM is the canonical var; EMAIL_FROM stays supported as an alias.
     const address =
       this.getTrimmedConfigValue("MAIL_FROM") ??
       this.getTrimmedConfigValue("EMAIL_FROM");
@@ -137,7 +158,9 @@ export class MailService {
       DEFAULT_FROM_NAME;
 
     if (!address) {
-      this.logger.error("Email configuration is incomplete.");
+      this.logger.error(
+        "Email configuration is incomplete or invalid. MAIL_FROM/EMAIL_FROM=missing.",
+      );
       throw new ServiceUnavailableException("Email service is not configured.");
     }
 
@@ -149,25 +172,6 @@ export class MailService {
     return value ? value : undefined;
   }
 
-  private parseSecureValue(
-    value: string | undefined,
-    port: number,
-  ): boolean | undefined {
-    if (!value) {
-      return Number.isNaN(port) ? undefined : port === 465;
-    }
-
-    const normalizedValue = value.toLowerCase();
-    if (normalizedValue === "true") return true;
-    if (normalizedValue === "false") return false;
-
-    return undefined;
-  }
-
-  private describeConfigValue(value: string | undefined): "set" | "missing" {
-    return value ? "set" : "missing";
-  }
-
   private getErrorMessage(error: unknown): string {
     if (error instanceof Error) {
       return error.message;
@@ -176,4 +180,5 @@ export class MailService {
     return "Unknown error";
   }
 }
+
 

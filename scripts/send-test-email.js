@@ -1,9 +1,10 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const nodemailer = require("nodemailer");
 const {
   renderTestEmailTemplate,
 } = require("../dist/mail/templates/test-email.template");
+
+const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
 const envPath = path.join(__dirname, "..", ".env");
 
@@ -30,8 +31,17 @@ if (fs.existsSync(envPath)) {
 }
 
 async function sendTestEmail() {
-  const requiredEnv = ["SMTP_USER", "MAIL_FROM"];
-  const missingEnv = requiredEnv.filter((key) => !process.env[key]);
+  const apiKey = (process.env.BREVO_API_KEY || "").trim();
+  const from = (process.env.MAIL_FROM || process.env.EMAIL_FROM || "").trim();
+  const fromName = (
+    process.env.MAIL_FROM_NAME ||
+    process.env.EMAIL_FROM_NAME ||
+    "Seraphe Beauty"
+  ).trim();
+
+  const missingEnv = [];
+  if (!apiKey) missingEnv.push("BREVO_API_KEY");
+  if (!from) missingEnv.push("MAIL_FROM");
 
   if (missingEnv.length > 0) {
     throw new Error(
@@ -39,44 +49,35 @@ async function sendTestEmail() {
     );
   }
 
-  const password = process.env.SMTP_PASSWORD || process.env.SMTP_PASS;
+  const to = (process.env.TEST_EMAIL_TO || "lauphix1@gmail.com").trim();
+  const response = await fetch(BREVO_API_URL, {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      "api-key": apiKey,
+    },
+    body: JSON.stringify({
+      sender: { name: fromName, email: from },
+      to: [{ email: to }],
+      subject: "Seraphe Beauty Email Test",
+      textContent:
+        "Seraphe Beauty\n\nBrevo email API has been configured successfully.",
+      htmlContent: renderTestEmailTemplate(),
+    }),
+  });
 
-  if (!password) {
-    throw new Error("Missing email environment variables: SMTP_PASS");
+  if (!response.ok) {
+    const detail = (await response.text()).slice(0, 500);
+    throw new Error(`Brevo API request failed with status ${response.status}${detail ? `: ${detail}` : "."}`);
   }
 
-  const host = process.env.SMTP_HOST || "smtp-relay.brevo.com";
-  const port = Number(process.env.SMTP_PORT || "587");
-  const secure =
-    process.env.SMTP_SECURE !== undefined
-      ? process.env.SMTP_SECURE === "true"
-      : port === 465;
-
-  const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    requireTLS: !secure,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: password,
-    },
-  });
-
-  const to = process.env.TEST_EMAIL_TO || "lauphix1@gmail.com";
-  const fromName = process.env.MAIL_FROM_NAME || "Seraphe Beauty";
-  const result = await transporter.sendMail({
-    from: `"${fromName}" <${process.env.MAIL_FROM}>`,
-    to,
-    subject: "Seraphe Beauty Email Test",
-    text: "Seraphe Beauty\n\nBrevo SMTP has been configured successfully.",
-    html: renderTestEmailTemplate(),
-  });
-
-  console.log(`Test email sent to ${to}. Message ID: ${result.messageId}`);
+  const body = await response.json();
+  console.log(`Test email sent to ${to}. Message ID: ${body.messageId}`);
 }
 
 sendTestEmail().catch((error) => {
   console.error(`Failed to send test email: ${error.message}`);
   process.exit(1);
 });
+
