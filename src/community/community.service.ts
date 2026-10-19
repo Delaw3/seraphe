@@ -8,6 +8,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model, QueryFilter, Types } from "mongoose";
 import { MailService } from "../mail/mail.service";
 import { renderNewsletterWelcomeTemplate } from "../mail/templates/newsletter-welcome.template";
+import { EMAIL_FOOTER_TEXT } from "../mail/templates/email-footer";
 import { ApiResponse } from "../shop/interfaces/api-response.interface";
 import {
   createApiResponse,
@@ -174,7 +175,8 @@ export class CommunityService {
         text:
           `Hi ${name?.trim() || "there"},\n\n` +
           "Thank you for joining the Seraphe Beauty community. You are now on the list for beauty tips, product updates, skincare notes, and special announcements.\n\n" +
-          "Visit Seraphe Beauty: https://seraphebeauty.org",
+          "Visit Seraphe Beauty: https://seraphebeauty.org" +
+          EMAIL_FOOTER_TEXT,
         html: renderNewsletterWelcomeTemplate({ name }),
       });
     } catch (error) {

@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { renderTestEmailTemplate } from "./templates/test-email.template";
+import { EMAIL_FOOTER_TEXT } from "./templates/email-footer";
 
 export interface SendEmailOptions {
   to: string;
@@ -92,7 +93,9 @@ export class MailService {
     return this.sendEmail({
       to: to.toLowerCase().trim(),
       subject: "Seraphe Beauty Email Test",
-      text: "Seraphe Beauty\n\nEmail service has been configured successfully.",
+      text:
+        "Seraphe Beauty\n\nEmail service has been configured successfully." +
+        EMAIL_FOOTER_TEXT,
       html: renderTestEmailTemplate(),
     });
   }

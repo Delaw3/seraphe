@@ -1,4 +1,5 @@
 import { renderEmailLogoHeader } from "./email-branding";
+import { renderEmailFooter } from "./email-footer";
 
 export function renderTestEmailTemplate(): string {
   return `
@@ -28,6 +29,7 @@ export function renderTestEmailTemplate(): string {
                     </p>
                   </td>
                 </tr>
+                ${renderEmailFooter()}
               </table>
             </td>
           </tr>

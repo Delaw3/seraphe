@@ -1,4 +1,5 @@
 import { renderEmailLogoHeader } from "./email-branding";
+import { renderEmailFooter } from "./email-footer";
 
 export interface NewsletterWelcomeTemplateOptions {
   name?: string;
@@ -52,6 +53,7 @@ export function renderNewsletterWelcomeTemplate(
                     </table>
                   </td>
                 </tr>
+                ${renderEmailFooter()}
               </table>
             </td>
           </tr>
