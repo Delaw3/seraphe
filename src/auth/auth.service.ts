@@ -191,21 +191,16 @@ export class AuthService {
       throw new BadRequestException("Invalid or expired OTP.");
     }
 
-    const otpMatches = await bcrypt.compare(dto.otp, otpHash);
+    const otpMatches = await bcrypt.compare(dto.otp.trim(), otpHash);
 
     if (!otpMatches) {
       throw new BadRequestException("Invalid or expired OTP.");
     }
 
-    if (dto.oldPassword) {
-      const oldPasswordMatches = await bcrypt.compare(
-        dto.oldPassword,
-        admin.passwordHash,
+    if (dto.newPassword !== dto.confirmPassword) {
+      throw new BadRequestException(
+        "Confirm password must match new password.",
       );
-
-      if (!oldPasswordMatches) {
-        throw new UnauthorizedException("Invalid old password.");
-      }
     }
 
     admin.passwordHash = await bcrypt.hash(dto.newPassword, 12);

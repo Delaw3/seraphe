@@ -121,6 +121,7 @@ export class AuthController {
   }
 
   @Post("forgot-password/reset")
+  @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     schema: { example: { message: "Password reset successfully." } },
   })
